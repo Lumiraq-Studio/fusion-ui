@@ -14,25 +14,16 @@ env:
   APP_NAME: fusion-ui
 
 jobs:
-  # 🔹 Job 1: Build only on PR
+  # PR build only
   build-on-pr:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    env:
-      NODE_ENV: development
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - run: npm ci
-      - run: npm run build
-
       - uses: docker/setup-buildx-action@v3
 
-      - name: Build Angular Docker image (no push)
+      - name: Build Docker image (development config)
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -41,21 +32,12 @@ jobs:
             CONFIGURATION=development
           tags: temp-${{ env.APP_NAME }}:test
 
-  # 🔹 Job 2: Build + Push on merge
+  # Merge → build & push
   build-and-push:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    env:
-      NODE_ENV: production
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - run: npm ci
-      - run: npm run build
 
       - uses: docker/setup-buildx-action@v3
 
@@ -74,7 +56,7 @@ jobs:
             echo "IMAGE_REPO=lumiraqdev/fusion-ui-dev" >> $GITHUB_ENV
             echo "CONFIGURATION=development" >> $GITHUB_ENV
 
-      - name: Build and Push Angular Docker Image
+      - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
           context: .
