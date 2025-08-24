@@ -1,0 +1,26 @@
+services:
+  fusion-ui-dev:
+    container_name: fusion-ui-dev
+    restart: always
+    build:
+      context: .
+      args:
+        CONFIGURATION: development
+      dockerfile: Dockerfile
+    ports:
+      - "9898:80"
+    profiles:
+      - development
+
+  fusion-ui-prod:
+    container_name: fusion-ui-prod
+    restart: always
+    build:
+      context: .
+      args:
+        CONFIGURATION: production
+      dockerfile: Dockerfile
+    ports:
+      - "6767:80"
+    profiles:
+      - production
