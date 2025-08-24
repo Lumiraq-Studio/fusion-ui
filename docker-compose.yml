@@ -1,0 +1,26 @@
+services:
+  navoda-ui-dev:
+    container_name: navoda-ui-dev
+    restart: always
+    build:
+      context: .
+      args:
+        CONFIGURATION: development
+      dockerfile: Dockerfile
+    ports:
+      - "9898:80"
+    profiles:
+      - development
+
+  navoda-ui-prod:
+    container_name: navoda-ui-prod
+    restart: always
+    build:
+      context: .
+      args:
+        CONFIGURATION: production
+      dockerfile: Dockerfile
+    ports:
+      - "6767:80"
+    profiles:
+      - production
