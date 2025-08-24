@@ -1,0 +1,392 @@
+<div class="flex">
+    <div class="flex-1 p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold">Sales People</h1>
+        </div>
+
+        <div class="flex flex-wrap justify-between gap-3 mb-6">
+            <div class="flex flex-1 gap-3">
+                <div class="relative">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                        <fa-icon [icon]="faSearch" class="text-primary-200"></fa-icon>
+                    </div>
+                    <input type="search" placeholder="Search sales people"
+                           class="ps-10 form-input">
+                </div>
+
+                <div class="relative">
+                    <select class="form-input">
+                        <option value="all">All Sales People</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="relative">
+                    <button class="btn btn-primary whitespace-nowrap ml-auto" (click)="this.fetchSalesPeople()">
+                        <fa-icon [icon]="faSearch" class="mr-2"></fa-icon>
+                        Search
+                    </button>
+                </div>
+
+                <button class="btn btn-primary whitespace-nowrap ml-auto" (click)="$$createStockModal.set(true);">
+                    Assign Stock
+                </button>
+
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg border border-primary-50 p-4">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="mb-6">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Name</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Contact</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Status</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-primary-50">
+                        @if (SalePersonDTOS.length) {
+                            @for (person of SalePersonDTOS; track person.id) {
+                                <tr class="hover:bg-primary-50">
+                                    <td class="px-4 py-2 text-sm">{{ person.name | titlecase }}</td>
+                                    <td class="px-4 py-2 text-sm">{{ person.contactDetails }}</td>
+                                    <td class="px-4 py-3">
+                                        <app-status-badge [status]="person.status"></app-status-badge>
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <button class="p-1 hover:bg-primary-100 rounded"
+                                                (click)="openCreateModel(person.id); $$viewStockHistoryModal.set(true)">
+                                            <fa-icon [icon]="faEllipsisV"></fa-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <app-pagination [totalItems]="totalItems" [itemsPerPage]="itemsPerPage"
+                            (pageChanged)="onPageChange($event)"></app-pagination>
+        </div>
+    </div>
+
+    <!-- Right summary panel -->
+    <div class="w-80 border-l border-primary-100 p-6 bg-white min-h-screen">
+        <div class="space-y-6 divide-y divide-primary-100">
+
+            <div class="pb-6">
+                <h2 class="text-sm font-medium mb-4">SALES TEAM OVERVIEW</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-2xl font-semibold">{{ salesTeamSummaryDTOS[0]?.totalSalesPeople }}</div>
+                        <div class="text-sm text-primary-400">Total Sales People</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-semibold">{{ salesTeamSummaryDTOS[0]?.activeMembers }}</div>
+                        <div class="text-sm text-primary-400">Active Members</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="py-6">
+                <h2 class="text-sm font-medium mb-4">PERFORMANCE METRICS</h2>
+                <div class="grid  gap-4">
+                    <div>
+                        <div class="text-2xl font-semibold">Rs. {{ salesTeamSummaryDTOS[0]?.avgMonthlySales }}</div>
+                        <div class="text-sm text-primary-400">Monthly Sales</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-semibold">{{ salesTeamSummaryDTOS[0]?.targetAchievementPercentage }}%
+                        </div>
+                        <div class="text-sm text-primary-400">Avg. Target</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@defer (when $$viewStockHistoryModal) {
+    @if ($$viewStockHistoryModal()) {
+        <div class="fixed inset-0 bg-primary-600/50 flex items-center justify-center z-40">
+            <div class="bg-white rounded-lg shadow-xl md:w-[960px] max-h-[90vh] flex flex-col">
+                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                    <div>
+                        <h2 class="text-lg font-semibold">Assignment History</h2>
+                        <p class="text-sm text-gray-500">
+                            {{ $$SelectedSalesPerson()?.name ? 'Sales Representative - ' + $$SelectedSalesPerson()?.name : '' }}
+                        </p>
+                    </div>
+                    <button (click)="closeModal()" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                        <fa-icon [icon]="faXmark"></fa-icon>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-6">
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                            <table class="w-full text-sm">
+                                <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">Product</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">Variant</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">Assigned</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">Remaining</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">Sold</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    @for (product of SalesRepStock[0]?.availableStock; track product.productId) {
+                                        @for (variant of product.variants; track variant.variantId) {
+                                            <tr class="hover:bg-gray-50 border-b last:border-b-0 transition-colors">
+                                                <td class="px-4 py-3">{{ product.productName }}</td>
+                                                <td class="px-4 py-3">{{ variant.variant }}</td>
+                                                <td class="px-4 py-3">{{ variant.assignedQty }}</td>
+                                                <td class="px-4 py-3">{{ variant.remainingQty }}</td>
+                                                <td class="px-4 py-3">{{ variant.soldQty || '-' }}</td>
+                                                <td class="px-4 py-3">
+                                                    <button (click)="unAssign(variant.stockBreakdownId)"
+                                                            class="px-4 py-1 text-xs font-normal text-white bg-primary-600 hover:bg-primary-700 rounded-lg disabled:opacity-50 transition-colors">
+                                                        Unassign
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    } @empty {
+                                        <tr>
+                                            <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                                                <div class="flex flex-col items-center justify-center">
+                                                    <fa-icon [icon]="faBoxOpen" class="text-3xl mb-2"></fa-icon>
+                                                    <p>No stocks assigned for this sales rep</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@defer (when $$createStockModal) {
+    @if ($$createStockModal()) {
+        <div class="fixed inset-0 bg-primary-600/50 flex items-center justify-center z-40">
+            <div class="bg-white rounded-lg shadow-xl md:w-[960px] max-h-[90vh] flex flex-col">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                    <div>
+                        <h2 class="text-lg font-semibold">Manage Sales Person Stock</h2>
+                        <p class="text-sm text-gray-500">
+                            Inventory assignment management for sales representatives
+                        </p>
+                    </div>
+                    <button (click)="closeModal()" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                        <fa-icon [icon]="faXmark"></fa-icon>
+                    </button>
+                </div>
+
+                <!-- Dropdowns for Sales Person and Product -->
+                <div class="space-y-6 bg-gray-50 p-4 rounded-lg mb-6">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <!-- Sales Person Dropdown -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <fa-icon [icon]="faPeopleCarry" class="mr-2 text-primary-500"></fa-icon>
+                                Select Sales Person
+                            </label>
+                            <select
+                                    class="w-full form-select border rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                    [ngModel]="$$SalesPersonID()"
+                                    (ngModelChange)="onSalesPersonChange($event)">
+                                <option value="0" disabled selected>Choose a sales person</option>
+                                @for (person of SalePersonDTOS; track person.id) {
+                                    <option [value]="person.id">{{ person.name }}</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Product Dropdown -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <fa-icon [icon]="faBoxOpen" class="mr-2 text-primary-500"></fa-icon>
+                                Select Product
+                            </label>
+                            <select
+                                    class="w-full form-select border rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                    [ngModel]="$$ProductID()"
+                                    (ngModelChange)="onProductSelect($event)">
+                                <option value="0" disabled selected>Choose a product</option>
+                                @for (product of AllProducts; track product.id) {
+                                    <option [value]="product.id">{{ product.name }}</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock History and Variant Stock Tables -->
+                <div class="flex-1 overflow-y-auto p-6">
+                    <div class="space-y-8">
+                        @if ($$hasStock()) {
+                            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                                <h3 class="text-md font-semibold p-4 bg-gray-50">Sales Representative Stock History</h3>
+                                <table class="w-full text-sm">
+                                    <thead>
+                                    <tr class="bg-gray-50">
+                                        <th class="px-4 py-3 text-left font-medium text-gray-700">Product</th>
+                                        <th class="px-4 py-3 text-left font-medium text-gray-700">Variant</th>
+                                        <th class="px-4 py-3 text-left font-medium text-gray-700">Assigned QTY</th>
+                                        <th class="px-4 py-3 text-left font-medium text-gray-700">Remaining QTY</th>
+                                        <th class="px-4 py-3 text-left font-medium text-gray-700">Sold QTY</th>
+                                        <th class="px-4 py-3 text-left font-medium text-gray-700">Updated QTY</th>
+                                        <th class="px-4 py-3 text-left font-medium text-gray-700">Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (product of SalesRepStock[0]?.availableStock; track product.productId) {
+                                            @for (variant of product.variants; track variant.variantId) {
+                                                <tr class="hover:bg-gray-50 border-b last:border-b-0 transition-colors">
+                                                    <td class="px-4 py-3">{{ product.productName }}</td>
+                                                    <td class="px-4 py-3">{{ variant.variant }}</td>
+                                                    <td class="px-4 py-3">{{ variant.assignedQty }}</td>
+                                                    <td class="px-4 py-3">{{ variant.remainingQty }}</td>
+                                                    <td class="px-4 py-3">{{ variant.soldQty || '-' }}</td>
+                                                    <td class="px-4 py-3">
+                                                        <input
+                                                                type="number"
+                                                                class="w-28 form-input rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                                                min="0"
+                                                                [(ngModel)]="variant.tempUpdateQty"
+                                                                [value]="variant.assignedQty"
+                                                        >
+                                                    </td>
+                                                    <td class="px-4 py-3">
+                                                        <button
+                                                                (click)="updateStock(variant.repStockId, variant.stockBreakdownId, variant.tempUpdateQty, variant.variantStockId)"
+                                                                class="px-4 py-1 text-xs font-normal text-white bg-primary-600 hover:bg-primary-700 rounded-lg disabled:opacity-50 transition-colors">
+                                                            Update
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                            <tr>
+                                                <td colspan="7" class="px-1 py-1">
+                                                    <div class="flex items-center text-sm text-red-800 bg-red-50 dark:bg-gray-800 dark:text-red-400 min-h-[48px] py-3" role="alert">
+                                                        <svg class="ml-3 shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                                                        </svg>
+                                                        <span class="sr-only">Info</span>
+                                                        <div>
+                                                            Please note that you can only update the quantities.
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                        } @empty {
+                                            <tr>
+                                                <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+                                                    <div class="flex flex-col items-center justify-center">
+                                                        <fa-icon [icon]="faBoxOpen" class="text-3xl mb-2"></fa-icon>
+                                                        <p>No stocks assigned for this sales rep</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+
+                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                            <h3 class="text-md font-semibold p-4 bg-gray-50">New Variant Stocks</h3>
+                            <table class="w-full text-sm">
+                                <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">Product Name</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">Weight</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">Base Price</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">Available Quantity</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">Assigned Quantity</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    @for (product of productDetailsDTOS; track product.productId) {
+                                        @if (product.variants.length) {
+                                            @for (variant of product.variants; track variant.variantId) {
+                                                <tr class="hover:bg-gray-50 border-b last:border-b-0 transition-colors">
+                                                    <td class="px-4 py-3">{{ product.productName }}</td>
+                                                    <td class="px-4 py-3">
+                                                        <span class="font-medium">{{ variant.weight }}</span>
+                                                        <span class="text-gray-500 ml-1">{{ variant.unit | titlecase }}</span>
+                                                    </td>
+                                                    <td class="px-4 py-3">
+                                                        <span class="text-primary-600">Rs. {{ variant.basePrice.toFixed(2) || '-' }}</span>
+                                                    </td>
+                                                    <td class="px-4 py-3">{{ variant.availableQTY || 0 }}</td>
+                                                    <td class="px-4 py-3">
+                                                        <div class="flex items-center space-x-2">
+                                                            <input
+                                                                    type="number"
+                                                                    class="w-28 text-xs form-input rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                                                                    min="0"
+                                                                    [max]="variant.availableQTY"
+                                                                    [(ngModel)]="variant.newQuantity"
+                                                                    [disabled]="variant.isAssigned ?? false"
+                                                                    [ngClass]="{'bg-gray-200 cursor-not-allowed': variant.isAssigned}"
+                                                            >
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        <tr>
+                                            <td colspan="5" class="px-1 py-1">
+                                                <div class="flex items-center text-sm text-red-800 bg-red-50 dark:bg-gray-800 dark:text-red-400 min-h-[48px] py-3" role="alert">
+                                                    <svg class="ml-3 shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                                                    </svg>
+                                                    <span class="sr-only">Info</span>
+                                                    <div>
+                                                        Important: The quantity entered must not exceed the available quantity of the variant.
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    } @empty {
+                                        <tr>
+                                            <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                                                <div class="flex flex-col items-center justify-center">
+                                                    <fa-icon [icon]="faBoxOpen" class="text-3xl mb-2"></fa-icon>
+                                                    <p>No unassigned product variants available</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="p-4 border-t border-gray-200 flex justify-end">
+                                <button
+                                        (click)="confirmAssignments()"
+                                        class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg disabled:opacity-50"
+                                        [disabled]="!hasValidAssignments()"
+                                >
+                                    Add Stocks
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

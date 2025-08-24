@@ -1,0 +1,180 @@
+<div class="flex">
+    <!-- Main content area -->
+    <div class="flex-1 p-6 lg:mr-80">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold">Route Details</h1>
+        </div>
+        <!-- Search and Filters Section -->
+        <div class="flex flex-wrap justify-between gap-3 mb-6">
+            <div class="flex flex-1 gap-3">
+                <div class="relative">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                        <fa-icon [icon]="faSearch" class="text-primary-200"></fa-icon>
+                    </div>
+                    <input [(ngModel)]="searchParams.route_name" type="text" placeholder="Search Route"
+                           class="ps-10 form-input">
+                </div>
+                <button (click)="fetchRoutes()" class="btn btn-primary">
+                    <fa-icon [icon]="faSearch" class="mr-2"></fa-icon>
+                    Search
+                </button>
+            </div>
+
+            <button class="btn btn-primary whitespace-nowrap ml-auto" (click)="$$CreateModal.set(true)">
+                Add Route
+                <fa-icon [icon]="faPlus" class="ml-2"></fa-icon>
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg border border-primary-50 p-4">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="mb-6">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Route Name</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Route Area</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Total Shops</th>
+                        <th class="w-10 p-4"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-primary-50">
+                        @if (routesResultDTOS.length) {
+                            @for (route of routesResultDTOS; track route.id) {
+                                <tr class="hover:bg-primary-50">
+                                    <td class="px-4 py-2 text-sm">{{ route.name | titlecase }}
+                                    <td class="px-4 py-2 text-sm">{{ route.area | titlecase }}</td>
+                                    <td class="px-4 py-2 text-sm">{{ route.shopCount }}</td>
+                                    <td class="p-2">
+                                        <button class="p-1 hover:bg-primary-100 rounded"
+                                                (click)="openUpdateModal(route)">
+                                            <fa-icon [icon]="faEllipsisV"></fa-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <app-pagination [totalItems]="totalItems" [itemsPerPage]="itemsPerPage"
+                            (pageChanged)="onPageChange($event)"></app-pagination>
+        </div>
+    </div>
+</div>
+
+<!-- Right summary panel -->
+<div class="hidden lg:block fixed right-0 w-80 border-l border-primary-100 p-6 bg-white top-0 h-screen">
+    <div class="space-y-6 divide-y divide-primary-100">
+        <div class="pb-6">
+            <h2 class="text-sm font-medium mb-4">ROUTE SUMMARY</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <div class="text-2xl font-semibold">{{ this.totalItems }}</div>
+                    <div class="text-sm text-primary-400">Active Routes</div>
+                </div>
+            </div>
+        </div>
+        <div class="space-y-6 divide-y divide-primary-100">
+        </div>
+    </div>
+</div>
+
+
+
+<!--Customer Create popup-->
+@defer (when $$CreateModal) {
+    @if ($$CreateModal()) {
+        <div class="fixed inset-0 bg-primary-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl w-[480px] max-h-[90vh] overflow-hidden">
+                <!-- Header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold">
+                        @if ($$UpdateMode()) {
+                            Edit Route Details
+                        } @else {
+                            Create New Route
+                        }
+                    </h2>
+                    <button (click)="closeModal()" class="p-2 hover:bg-gray-100 rounded-full">
+                        <fa-icon [icon]="faXmark"></fa-icon>
+                    </button>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                    <div class="space-y-4">
+                        <!-- Full Name Field -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Route Name</label>
+                            <input
+                                    [(ngModel)]="route.name"
+                                    type="text"
+                                    class="w-full form-input"
+                                    placeholder="Enter full name"
+                                    #RouteNameInput="ngModel"
+                                    required
+                                    minlength="3"
+                            >
+                            @if (RouteNameInput.invalid && (RouteNameInput.dirty || RouteNameInput.touched)) {
+                                <div class="text-red-500 text-sm mt-1">
+                                    @if (RouteNameInput.errors?.['required']) {
+                                        Route Name is required
+                                    }
+                                    @if (RouteNameInput.errors?.['minlength']) {
+                                        Route Name must be at least 3 characters
+                                    }
+                                </div>
+                            }
+                        </div>
+
+
+                        <!-- Address Field -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Route Area</label>
+                            <input
+                                    [(ngModel)]="route.area"
+                                    class="w-full form-input resize-none"
+                                    placeholder="Enter area name"
+                                    #areaInput="ngModel"
+                                    minlength="3"
+                            >
+                            @if (areaInput.invalid && (areaInput.dirty || areaInput.touched)) {
+                                <div class="text-red-500 text-sm mt-1">
+                                    @if (areaInput.errors?.['required']) {
+                                        Area Name is required
+                                    }
+                                    @if (areaInput.errors?.['minlength']) {
+                                        Area Name must be at least 3 characters
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="border-t border-gray-200 pt-4 mt-6 flex justify-end gap-3">
+                            <button
+                                    type="button"
+                                    (click)="closeModal()"
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                    (click)="CreateRoute()"
+                                    [disabled]="!isFormValid()"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg disabled:opacity-50"
+                            >
+                                @if ($$UpdateMode()) {
+                                    Update Route
+                                } @else {
+                                    Create Route
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

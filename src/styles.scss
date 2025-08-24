@@ -1,0 +1,17 @@
+@use 'app/core/styles/components' as components;
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  @include components.Component;
+}
+
+// Base styles
+@layer base {
+  body {
+    @apply bg-background-primary text-gray-900;
+  }
+}
+

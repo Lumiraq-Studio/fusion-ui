@@ -1,0 +1,125 @@
+@if (isOpen) {
+    <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-40">
+        <div class="bg-white rounded-xl shadow-2xl w-[900px] max-h-[90vh] overflow-hidden">
+            @if (selectedOrder$ | async; as order) {
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-xl font-semibold text-gray-900">Order. {{ order.orderReference }}</h2>
+                        <app-status-badge [status]="order.status"></app-status-badge>
+                    </div>
+                    <button (click)="close()"
+                            class="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                        <fa-icon [icon]="faXmark"></fa-icon>
+                    </button>
+                </div>
+
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                    <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+                        <div class="grid grid-cols-3 divide-x divide-gray-200">
+                            <div class="px-4 first:pl-0">
+                                <div class="text-sm text-gray-500">Shop</div>
+                                <div class="text-sm font-medium mt-1">{{ order.shopCode }} - {{ order.shopName }}
+                                </div>
+                            </div>
+                            <div class="px-4">
+                                <div class="text-sm text-gray-500">Order Date & Time</div>
+                                <div class="text-sm font-medium mt-1">{{ order.orderDate | date:'mediumDate' }} - {{ order.orderTime }}  </div>
+                            </div>
+                            <div class="px-4">
+                                <div class="text-sm text-gray-500">Sales Rep</div>
+                                <div class="text-sm font-medium mt-1">#{{ order.salesRepId }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+                        <h3 class="text-sm font-semibold mb-4 flex items-center gap-2">
+                            <fa-icon [icon]="faWallet" class="text-primary-500"></fa-icon>
+
+                            Payment Information
+                        </h3>
+                        <div class="grid grid-cols-3 gap-6">
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="text-sm text-gray-500">Payment Type</div>
+                                <div class="text-sm font-medium mt-1">
+                                    {{ order.paymentType === 1 ? 'Credit' : 'Cash' }}
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="text-sm text-gray-500">Order Amount</div>
+                                <div class="text-sm font-medium mt-1">Rs.{{ order.orderAmount | number:'1.2-2' }}
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="text-sm text-gray-500">Paid Amount</div>
+                                <div class="text-sm font-medium mt-1">Rs.{{ order.paidAmount | number:'1.2-2' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg border border-gray-200">
+                        <div class="p-4 border-b border-gray-200">
+                            <h3 class="text-sm font-semibold flex items-center gap-2">
+                                <fa-icon [icon]="faBox" class="text-primary-500"></fa-icon>
+                                Product Details
+                            </h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200">
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Product Name
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Weight</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Price/Unit
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Quantity</th>
+                                    <th class="px-4 py-3 text-right text-sm font-medium text-gray-600">Total</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    @for (item of order.orderItems; track item.orderItemId) {
+                                        <tr class="border-gray-200 hover:bg-gray-50 transition-colors">
+                                            <td class="px-4 py-3 text-sm">{{ item.productName }}</td>
+                                            <td class="px-4 py-3 text-sm">{{ item.weight }} {{ item.unit }}</td>
+                                            <td class="px-4 py-3 text-sm">Rs.{{ item.price | number:'1.2-2' }}</td>
+                                            <td class="px-4 py-3 text-sm">{{ item.quantity }}</td>
+                                            <td class="px-4 py-3 text-sm text-right font-medium">
+                                                Rs.{{ item.totalPrice | number:'1.2-2' }}
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-200 rounded-lg p-4 bg-gray-50">
+                    @if (order.status == 'unpaid') {
+                        <div class="flex justify-between items-center">
+                            <div class="text-sm text-gray-500">
+                                <fa-icon [icon]="faInfoCircle" class="mr-2"></fa-icon>
+                                Changes will be reflected immediately
+                            </div>
+                            <div class="flex gap-3">
+                                <button
+                                        type="button"
+                                        (click)="close()"
+                                        class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                                    Cancel
+                                </button>
+                                <button
+                                        class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg disabled:opacity-50 transition-colors">
+                                    <fa-icon [icon]="faSave" class="mr-2"></fa-icon>
+                                    Update
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}

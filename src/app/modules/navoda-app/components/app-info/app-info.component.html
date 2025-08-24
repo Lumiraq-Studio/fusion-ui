@@ -1,0 +1,176 @@
+<div class="flex">
+    <div class="flex-1 p-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold">Navoda Sales App</h1>
+<!--            <button class="btn btn-primary">-->
+<!--                <fa-icon [icon]="faCloudDownload" class="mr-2"></fa-icon>-->
+<!--                Download Latest Version-->
+<!--            </button>-->
+        </div>
+
+        <!-- Filters -->
+        <div class="flex gap-3 mb-6">
+            <div class="relative">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                    <fa-icon [icon]="faSearch" class="text-primary-200"></fa-icon>
+                </div>
+                <input type="text" placeholder="Search versions" class="ps-10 form-input">
+            </div>
+            <div class="relative">
+                <select class="form-input">
+                    <option value="all">All Platforms</option>
+                    <option value="android">Android</option>
+                    <option value="ios">iOS</option>
+                </select>
+            </div>
+            <div class="relative">
+                <select class="form-input">
+                    <option value="latest">Latest First</option>
+                    <option value="oldest">Oldest First</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Apps Table -->
+        <div class="bg-white rounded-lg border border-primary-100 p-4">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="mb-6">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Version</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Platform</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Size</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Status</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Release Date</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Download</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-primary-100">
+                        @for (apk of apkDTOS; track apk) {
+                            <tr class="hover:bg-primary-50">
+                                <td class="px-4 py-3">
+                                    <div class="text-sm font-medium">v{{ apk.version }}</div>
+                                </td>
+                                <td class="px-4 py-3">
+                                                                <span class="flex items-center gap-2">
+                                                                    <fa-icon [icon]="faMobileAndroid1"
+                                                                             class="text-green-500"></fa-icon>
+                                                                    <span class="text-sm">{{ apk.platform }}</span>
+                                                                </span>
+                                </td>
+                                <td class="px-4 py-3 text-sm">{{ apk.size }} MB</td>
+                                <td class="px-4 py-3">
+                                    <app-status-badge [status]="apk.status"></app-status-badge>
+                                </td>
+                                <td class="px-4 py-3 text-sm">{{ apk.releaseDate }}</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex gap-2">
+                                        @if (apk.status != 'active'){
+                                            -
+                                        } @else {
+                                            <button class="btn btn-outline-primary btn-sm"
+                                                    (click)="openDownloadModal(apk)">
+                                                <fa-icon [icon]="faCloudDownload" class="mr-2"></fa-icon>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <app-pagination [totalItems]="totalItems" [itemsPerPage]="itemsPerPage"
+                            (pageChanged)="onPageChange($event)"></app-pagination>
+        </div>
+    </div>
+
+    <div class="w-80 flex-shrink-0 p-6">
+        <div class="bg-white rounded-lg border border-primary-100 p-6 space-y-6">
+            <div>
+                <h3 class="text-sm font-medium mb-4">LATEST RELEASE NOTES</h3>
+                <div class="text-sm text-primary-600 space-y-2">
+                    <p>• Customer create function added</p>
+                    <p>• Bug fixes and stability updates</p>
+                    <p>• App Size reduced - 50%</p>
+                </div>
+            </div>
+            <div class="pt-6 border-t border-primary-100">
+                <h3 class="text-sm font-medium mb-4">LATEST VERSION - V.1.1 </h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@if ($$DownloadModal()) {
+    <div class="fixed inset-0 bg-black/50  flex items-center justify-center z-50 ">
+        <div class="bg-white rounded-xl shadow-2xl w-[480px] max-h-[90vh] overflow-hidden ">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-5 border-b border-gray-100">
+                <h2 class="text-xl font-semibold flex items-center gap-2">
+                    <i class="fas fa-mobile-alt text-primary-600"></i>
+                    Download Sales App
+                </h2>
+                <button (click)="closeModal()"
+                        class="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
+                    <fa-icon [icon]="faXmark" class="text-gray-500"></fa-icon>
+                </button>
+            </div>
+
+            <!-- Content -->
+            <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                <div class="space-y-6">
+                    <!-- QR Code Section -->
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <div class="flex justify-center">
+                            @if (qrCodeDataUrl()) {
+                                <div class="p-4 bg-white rounded-lg shadow-sm">
+                                    <img [src]="qrCodeDataUrl()"
+                                         alt="QR Code"
+                                         class="w-48 h-48 animate-fadeIn"/>
+                                </div>
+                            } @else {
+                                <div class="w-48 h-48 flex items-center justify-center">
+                                    <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent"></div>
+                                </div>
+                            }
+                        </div>
+
+                        <p class="text-sm text-gray-600 text-center mt-4 flex items-center justify-center gap-2">
+                            <i class="fas fa-qrcode"></i>
+                            Scan with your mobile device to download
+                        </p>
+                    </div>
+
+                    <!-- Error Message -->
+                    @if (qrError()) {
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <p class="text-sm text-red-600 flex items-center gap-2">
+                                <fa-icon [icon]="faExclamationCircle"></fa-icon>
+                                {{ qrError() }}
+                            </p>
+                        </div>
+                    }
+
+                    <!-- Alternative Download -->
+                    <div class="border-t border-gray-100 pt-6 mt-6">
+                        <div class="flex justify-end gap-3">
+                            <button (click)="closeModal()"
+                                    class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors">
+                                Cancel
+                            </button>
+                            <button (click)="downloadApk()"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                                <fa-icon [icon]="faDownload"></fa-icon>
+                                Download APK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

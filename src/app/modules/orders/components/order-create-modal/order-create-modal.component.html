@@ -1,0 +1,229 @@
+@if (isOpen) {
+    <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-40">
+        <div class="bg-white rounded-xl shadow-2xl w-[900px] max-h-[90vh] overflow-hidden">
+            <!-- Enhanced Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <div class="flex items-center gap-3">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900">Create New Order</h2>
+                    </div>
+                </div>
+                <button (click)="close()" class="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                    <fa-icon [icon]="faXmark"></fa-icon>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto max-h-[calc(90vh-320px)]">
+                <!-- Customer Selection with enhanced styling -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-sm font-semibold mb-3 text-gray-700 flex items-center gap-2">
+                        <fa-icon [icon]="faUser"></fa-icon>
+                        Customer Information
+                    </h3>
+                    <div class="relative w-full">
+                        <app-customer-search
+                                (shopSelected)="onCustomerSelected($event)"
+                                class="w-full">
+                        </app-customer-search>
+                    </div>
+                    @if (validationErrors.customer) {
+                        <p class="text-red-500 text-xs mt-2 flex items-center gap-1">
+                            <fa-icon [icon]="faExclamationCircle"></fa-icon>
+                            {{ validationErrors.customer }}
+                        </p>
+                    }
+                </div>
+
+                <!-- Product Section -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-sm font-semibold mb-3 text-gray-700 flex items-center gap-2">
+                        <fa-icon [icon]="faBox"></fa-icon>
+                        Product Details
+                    </h3>
+                    <div class="space-y-4">
+                        <!-- Product Selection -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">Select Product</label>
+                                <select class="form-input w-full"
+                                        [(ngModel)]="selectedProduct"
+                                        [disabled]="!$$selectedCustomer()"
+                                        (ngModelChange)="onProductChange($event)">
+                                    <option hidden [ngValue]="null">Choose a product</option>
+                                    @for (product of uniqueProducts; track product) {
+                                        <option [ngValue]="product">{{ product.productName | titlecase }}</option>
+                                    }@empty {
+                                        <option disabled selected value="">No Products Available</option>
+                                    }
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">Select Variant</label>
+                                <select class="form-input w-full"
+                                        [disabled]="!selectedProduct"
+                                        [(ngModel)]="selectedVariant">
+                                    <option hidden [ngValue]="null">Choose a variant</option>
+                                    @for (variant of getFilteredVariants(); track variant.variantId) {
+                                        <option [ngValue]="variant">{{ variant.weight }} {{ variant.unit }}</option>
+                                    }@empty {
+                                        <option disabled selected value="">No Variants Available</option>
+                                    }
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">Available Quantity</label>
+                                <input
+                                        [value]="selectedVariant?.qty"
+                                        disabled type="number" min="1"
+                                        class="form-input w-full"
+                                        placeholder="Select Variant">
+                            </div>
+                        </div>
+
+                        <!-- Price and Quantity -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">Price Per Unit</label>
+                                <input [value]="selectedVariant?.price"
+                                       type="number"
+                                       disabled
+                                       class="form-input bg-gray-100"
+                                       placeholder="Auto-calculated">
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600 mb-1 block">Order Quantity</label>
+                                <input [(ngModel)]="quantityInput"
+                                       [disabled]="selectedVariant?.qty == 0 || !selectedVariant "
+                                       (ngModelChange)="updateQuantity($event)" type="number" min="0"
+                                       class="form-input"
+                                       placeholder="Enter quantity">
+                            </div>
+                            <div class="flex items-end">
+                                <button class="w-full px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700
+                 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                                        [disabled]="!selectedVariant || quantityInput <= 0"
+                                        (click)="addToCart()">
+                                    <fa-icon [icon]="faPlus"></fa-icon>
+                                    Add to Order
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Section -->
+                <!-- Payment Section -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-sm font-semibold mb-3 text-gray-700 flex items-center gap-2">
+                        <fa-icon [icon]="faWallet"></fa-icon>
+                        Payment Details
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm text-gray-600 mb-1 block">Payment Type</label>
+                            <select class="form-input w-full"
+                                    [ngModel]="$$paymentMethod()"
+                                    [disabled] = "!$$cart().items.length"
+                                    (ngModelChange)="onPaymentMethodChange($event)">
+                                <option selected hidden [ngValue]="0">Select payment type</option>
+                                @for (method of paymentMethods.all(); track method.id) {
+                                    <option [value]="method.id">{{ method.description | titlecase }}</option>
+                                }
+                            </select>
+                            @if (validationErrors.orderType) {
+                                <p class="text-red-500 text-xs mt-1">{{ validationErrors.orderType }}</p>
+                            }
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600 mb-1 block">
+                                {{ $$paymentMethod() === 1 ? 'Billing Amount' : 'Paid Amount' }}
+                            </label>
+                            <input [value]="$$billingAmount()"
+                                   (input)="onBillingAmountChange($event)"
+                                   type="number"
+                                   class="form-input w-full"
+                                   [disabled] = "!$$paymentMethod()"
+                                   [class.bg-gray-100]="$$paymentMethod() === 1"
+                                   [readonly]="$$paymentMethod() === 1"
+                                   [max]="$$cart().total.toFixed(2)"
+                                   [placeholder]="$$paymentMethod() === 1 ? 'Total amount will be charged' : 'Enter paid amount'">
+                            @if (paidAmountError) {
+                                <p class="text-red-500 text-xs mt-1">{{ paidAmountError }}</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Order Items List with enhanced styling -->
+            @if ($$cart().items.length > 0) {
+                <div class="border-t border-gray-200 p-4">
+                    <h3 class="text-sm font-semibold mb-3 flex items-center gap-2">
+                        <fa-icon [icon]="faList"></fa-icon>
+                        Order Summary
+                    </h3>
+                    <div class="max-h-[200px] overflow-y-auto">
+                        <div class="space-y-2">
+                            @for (item of $$cart().items; track item.variantId) {
+                                <div class="bg-gray-50 p-4 rounded-lg grid grid-cols-5 gap-4 items-center hover:bg-gray-100
+                                            transition-colors">
+                                    <div class="flex flex-col">
+                                        <span class="text-xs text-gray-500">Quantity</span>
+                                        <span class="font-medium">{{ item.quantity }}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-xs text-gray-500">Price/Unit</span>
+                                        <span class="font-medium">Rs.{{ item.price }}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-xs text-gray-500">Total</span>
+                                        <span class="font-medium">Rs.{{ item.quantity * item.price }}</span>
+                                    </div>
+                                    <button class="justify-self-end text-red-600 hover:text-red-700 p-2 hover:bg-red-50
+                                                 rounded-full transition-colors"
+                                            (click)="removeFromCart(item.variantId)">
+                                        <fa-icon [icon]="faTrash"></fa-icon>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Enhanced Footer -->
+            <div class="border-t border-gray-200 p-4 bg-gray-50 flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="text-gray-500">Total Items:</span>
+                        <span class="font-semibold">{{ $$cart().items.length }}</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="text-gray-500">Total Amount:</span>
+                        <span class="font-semibold">Rs.{{ $$cart().total.toFixed(2) }}</span>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-lg
+                                 transition-colors flex items-center gap-2"
+                            (click)="resetOrder()">
+                        <fa-icon [icon]="faRotateLeft"></fa-icon>
+                        Reset
+                    </button>
+                    <button class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700
+                                 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50
+                                 disabled:hover:bg-primary-600"
+                            [disabled]="$$cart().items.length === 0 ||
+                   !$$paymentMethod()"
+                            (click)="createOrder()">
+                        Create Order
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+

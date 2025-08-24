@@ -1,0 +1,96 @@
+@mixin Component() {
+  // Container styles
+  .container-custom {
+    @apply mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  // Card styles
+  .card {
+    @apply bg-white rounded-lg border border-gray-200;
+
+    &.card-hover {
+      @apply hover:shadow-sm transition-all duration-200;
+    }
+  }
+
+  // Button styles
+  .btn {
+    @apply inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200;
+
+    &:disabled {
+      @apply opacity-50 cursor-not-allowed;
+    }
+
+    &-primary {
+      @apply bg-primary text-white hover:bg-primary-700;
+    }
+
+    &-secondary {
+      @apply bg-white border border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50;
+    }
+
+    &-dark {
+      @apply bg-gray-900 text-white hover:bg-gray-800;
+    }
+  }
+
+  // Table styles
+  .table-minimal {
+    @apply w-full;
+
+    th {
+      @apply px-4 py-3 text-left text-sm font-medium text-primary-600;
+    }
+
+    td {
+      @apply px-4 py-2 text-sm;
+    }
+
+    tbody {
+      tr {
+        @apply hover:bg-gray-50;
+      }
+    }
+  }
+
+  // Badge styles
+  .status-badge {
+    @apply inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-md;
+
+    &.active {
+      @apply bg-green-100 text-green-800;
+    }
+
+    &.inactive {
+      @apply bg-red-100 text-red-800;
+    }
+
+    &.approved {
+      @apply bg-sky-100 text-sky-800;
+    }
+  }
+
+  // Form styles
+  .form-input {
+    @apply bg-white border border-gray-300 text-gray-900 text-sm rounded-md block w-full p-2 disabled:opacity-50;
+    @apply focus:ring-gray-600 focus:ring-1 focus:border-primary;
+
+
+    &:disabled {
+      @apply bg-gray-50;
+    }
+  }
+
+  .form-select {
+    @apply bg-white border border-primary-200 text-gray-900 text-sm rounded-md block w-full p-2;
+    @apply focus:ring-gray-600 focus:ring-1 focus:border-primary;
+  }
+
+  .checkbox {
+    @apply rounded text-primary-600 focus:ring-gray-600 focus:ring-1 focus:border-primary
+  }
+
+  .focus {
+    @apply focus:ring-gray-600 focus:ring-1 focus:border-primary
+  }
+}

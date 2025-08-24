@@ -1,0 +1,614 @@
+<div class="flex">
+    <!-- Main content area -->
+    <div class="flex-1 p-6 ">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold">Inventory Control</h1>
+        </div>
+        <!-- Search and Filters Section -->
+        <div class="flex flex-wrap justify-between gap-3 mb-6">
+            <div class="flex flex-1 gap-3">
+                <div class="relative">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                        <fa-icon [icon]="faSearch" class="text-primary-200"></fa-icon>
+                    </div>
+                    <input type="text" placeholder="Product Name" class="ps-10 form-input">
+                </div>
+                <button class="btn btn-primary">
+                    <fa-icon [icon]="faSearch" class="mr-2"></fa-icon>
+                    Search
+                </button>
+            </div>
+
+            <button class="btn btn-primary whitespace-nowrap ml-auto" (click)="$$CreateModal.set(true)">
+                Add Product
+                <fa-icon [icon]="faPlus" class="ml-2"></fa-icon>
+            </button>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+            @for (product of AllProducts; track product.id) {
+                <div class="bg-white rounded-lg border border-primary-50 overflow-hidden">
+                    <div class="relative">
+                  <span class="absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium">
+                        <app-status-badge [status]="product.totalRemainingQty"></app-status-badge>
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold mb-2">{{ product.name | titlecase }}</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-primary-500">Available</span>
+                                <span class="font-medium">{{ product.totalRemainingQty ? product.totalRemainingQty + ' units' : '-' }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-primary-500">Reserved</span>
+                                <span class="font-medium">{{ product.totalRemainingQty ? product.totalAssignedQty + ' units' : '-' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-primary-50 p-4 flex justify-between">
+                        <button class="text-primary-600 hover:bg-primary-50 px-3 py-1 rounded"
+                                (click)="fetchProductDetails(product); this.$$StockUpdateModal.set(true);">
+                            <fa-icon [icon]="faEdit" class="mr-2"></fa-icon>
+                            Update
+                        </button>
+                        <button class="text-primary-600 hover:bg-primary-50 px-3 py-1 rounded"
+                                (click)="fetchProductDetails(product);">
+                            <fa-icon [icon]="faEye" class="mr-2"></fa-icon>
+                            View
+                        </button>
+                    </div>
+                </div>
+            } @empty {
+                <div class="col-span-full text-center p-8">
+                    <div class="flex justify-center items-center flex-col space-y-6">
+                        <fa-icon [icon]="faExclamationCircle" class="text-gray-400 text-6xl"></fa-icon>
+                        <p class="text-gray-500 text-xl font-semibold">No products available</p>
+                        <p class="text-gray-400 text-sm">It looks like there are no products to display at the moment. Please check back later.</p>
+                        <button (click)="$$CreateModal.set(true)" class="btn btn-primary whitespace-nowrap">
+                            Add Products
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Right summary panel -->
+<!--<div class="hidden lg:block fixed right-0 w-80 border-l border-primary-100 p-6 bg-white top-0 h-screen">-->
+<!--    <div class="space-y-6 divide-y divide-primary-100">-->
+<!--        <div class="pb-6">-->
+<!--            <h2 class="text-sm font-medium mb-4">INVENTORY VALUE</h2>-->
+<!--            <div class="grid grid-cols-2 gap-4">-->
+<!--                <div>-->
+<!--                    <div class="text-2xl font-semibold">රු4.8m</div>-->
+<!--                    <div class="text-sm text-primary-400">Total Value</div>-->
+<!--                </div>-->
+<!--                <div>-->
+<!--                    <div class="text-2xl font-semibold">1,245</div>-->
+<!--                    <div class="text-sm text-primary-400">Total Items</div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="py-6">-->
+<!--            <h2 class="text-sm font-medium mb-4">STOCK ALERTS</h2>-->
+<!--            <div class="space-y-2">-->
+<!--                <div class="flex justify-between items-center">-->
+<!--                    <div class="flex items-center gap-2">-->
+<!--                        <div class="w-2 h-2 rounded-full bg-red-500"></div>-->
+<!--                        <span class="text-sm">Low Stock</span>-->
+<!--                    </div>-->
+<!--                    <span class="text-sm">12 items</span>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between items-center">-->
+<!--                    <div class="flex items-center gap-2">-->
+<!--                        <div class="w-2 h-2 rounded-full bg-orange-500"></div>-->
+<!--                        <span class="text-sm">Reorder Soon</span>-->
+<!--                    </div>-->
+<!--                    <span class="text-sm">28 items</span>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between items-center">-->
+<!--                    <div class="flex items-center gap-2">-->
+<!--                        <div class="w-2 h-2 rounded-full bg-green-500"></div>-->
+<!--                        <span class="text-sm">Optimal</span>-->
+<!--                    </div>-->
+<!--                    <span class="text-sm">1,205 items</span>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="py-6">-->
+<!--            <h2 class="text-sm font-medium mb-4">TOP CATEGORIES</h2>-->
+<!--            <div class="space-y-3">-->
+<!--                <div class="flex justify-between items-center">-->
+<!--                    <span class="text-sm">Electronics</span>-->
+<!--                    <span class="text-sm font-medium">324 items</span>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between items-center">-->
+<!--                    <span class="text-sm">Accessories</span>-->
+<!--                    <span class="text-sm font-medium">256 items</span>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between items-center">-->
+<!--                    <span class="text-sm">Clothing</span>-->
+<!--                    <span class="text-sm font-medium">198 items</span>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="pt-6">-->
+<!--            <h2 class="text-sm font-medium mb-4">INVENTORY METRICS</h2>-->
+<!--            <div class="grid grid-cols-2 gap-4">-->
+<!--                <div>-->
+<!--                    <div class="text-2xl font-semibold">14</div>-->
+<!--                    <div class="text-sm text-primary-400">Days turnover</div>-->
+<!--                </div>-->
+<!--                <div>-->
+<!--                    <div class="text-2xl font-semibold">98%</div>-->
+<!--                    <div class="text-sm text-primary-400">Fill rate</div>-->
+<!--                </div>-->
+<!--                <div>-->
+<!--                    <div class="text-2xl font-semibold">0.8%</div>-->
+<!--                    <div class="text-sm text-primary-400">Dead stock</div>-->
+<!--                </div>-->
+<!--                <div>-->
+<!--                    <div class="text-2xl font-semibold">95%</div>-->
+<!--                    <div class="text-sm text-primary-400">Accuracy</div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--Customer Create popup-->
+@defer (when $$CreateModal) {
+    @if ($$CreateModal()) {
+        <div class="fixed inset-0 bg-primary-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl w-[480px] max-h-[90vh] overflow-hidden">
+                <!-- Header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold">
+                        @if ($$UpdateMode()) {
+                            Edit Product Details
+                        } @else {
+                            Add New Product
+                        }
+                    </h2>
+                    <button (click)="closeModal()" class="p-2 hover:bg-gray-100 rounded-full">
+                        <fa-icon [icon]="faXmark"></fa-icon>
+                    </button>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Product Name</label>
+                            <input
+                                    [(ngModel)]="product.productName"
+                                    type="text"
+                                    class="w-full form-input"
+                                    placeholder="Enter product name"
+                                    #ProductNameInput="ngModel"
+                                    required
+                                    minlength="3"
+                            >
+                            @if (ProductNameInput.invalid && (ProductNameInput.dirty || ProductNameInput.touched)) {
+                                <div class="text-red-500 text-sm mt-1">
+                                    @if (ProductNameInput.errors?.['required']) {
+                                        Product Name is required
+                                    }
+                                    @if (ProductNameInput.errors?.['minlength']) {
+                                        Product Name must be at least 3 characters
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <!-- Descripton Field -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Product Description</label>
+                            <input
+                                    [(ngModel)]="product.description"
+                                    class="w-full form-input resize-none"
+                                    placeholder="Enter product description"
+                                    #productDescription="ngModel"
+                                    minlength="3"
+                            >
+                            @if (productDescription.invalid && (productDescription.dirty || productDescription.touched)) {
+                                <div class="text-red-500 text-sm mt-1">
+                                    @if (productDescription.errors?.['required']) {
+                                        Product Name is required
+                                    }
+                                    @if (productDescription.errors?.['minlength']) {
+                                        Area Name must be at least 3 characters
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="border-t border-gray-200 pt-4 mt-6 flex justify-end gap-3">
+                            <button
+                                    type="button"
+                                    (click)="closeModal()"
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                    (click)="CreateProduct()"
+                                    [disabled]="!isFormValid()"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg disabled:opacity-50"
+                            >
+                                @if ($$UpdateMode()) {
+                                    Update Product
+                                } @else {
+                                    Add Product
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+
+@defer (when $$DetailsModal) {
+    @if ($$DetailsModal()) {
+        <div class="fixed inset-0 bg-primary-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl w-[480px] max-h-[90vh] overflow-hidden">
+                <!-- Header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold">
+                        {{ productDetailsDTOS[0].productName | titlecase }}
+                        - {{ productDetailsDTOS[0].sku | titlecase }}
+                    </h2>
+                    <button (click)="closeModal()" class="p-2 hover:bg-gray-100 rounded-full">
+                        <fa-icon [icon]="faXmark"></fa-icon>
+                    </button>
+                </div>
+                <div class="flex-grow overflow-y-auto p-4">
+                    <div class="space-y-4">
+                        <!-- Compact Variants Table -->
+                        <div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm pt-2">
+                                    <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="p-2 text-left">Variant SKU</th>
+                                        <th class="p-2 text-left">Weight</th>
+                                        <th class="p-2 text-left">Base Price</th>
+                                        <th class="p-2 text-left">Available QTY</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (product of productDetailsDTOS; track product) {
+                                            @for (variant of product.variants; track variant.variantId) {
+                                                <tr class="hover:bg-gray-50 border-b last:border-b-0">
+                                                    <td class="p-2">{{ variant.sku || '-' | uppercase }}</td>
+                                                    <td class="p-2">{{ variant.weight }} {{ variant.unit | titlecase }}</td>
+                                                    <td class="p-2">Rs. {{ variant.basePrice.toFixed(2) || '-' }}</td>
+                                                    <td class="p-2">{{ variant.availableQTY || '-' }}</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Base Price Section -->
+                        <div class="mb-4 flex items-center">
+                            <input
+                                    type="checkbox"
+                                    [(ngModel)]="enableField"
+                                    class="mr-2 checkbox"
+                                    id="newVariantCheck"
+                            >
+                            <label for="newVariantCheck" class="text-sm font-medium text-gray-700">
+                                Add new Variant
+                            </label>
+                        </div>
+
+                        <!-- Base Price Input -->
+                        @if (enableField) {
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Variant Weight</label>
+                                <input
+                                        type="number"
+                                        [(ngModel)]="variant.weight"
+                                        [disabled]="!enableField"
+                                        min="0"
+                                        class="w-full form-input border rounded-md p-2"
+                                        placeholder="Enter variant Weight"
+                                        #variantValue="ngModel"
+                                        [required]="enableField"
+                                >
+                                @if (enableField && variantValue.invalid && (variantValue.dirty || variantValue.touched)) {
+                                    <div class="text-red-500 text-sm mt-1">
+                                        Variant Weight cannot be empty
+                                    </div>
+                                }
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Base Price</label>
+                                <input
+                                        type="number"
+                                        [(ngModel)]="variant.basePrice"
+                                        [disabled]="!enableField"
+                                        min="0"
+                                        class="w-full form-input border rounded-md p-2"
+                                        placeholder="Enter base price"
+                                        #variantBasePrice="ngModel"
+                                        [required]="enableField"
+                                >
+                                @if (enableField && variantBasePrice.invalid && (variantBasePrice.dirty || variantBasePrice.touched)) {
+                                    <div class="text-red-500 text-sm mt-1">
+                                        Variant base price cannot be empty
+                                    </div>
+                                }
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Variant Cost</label>
+                                <input
+                                        type="number"
+                                        [(ngModel)]="variant.cost"
+                                        [disabled]="!enableField"
+                                        min="0"
+                                        class="w-full form-input border rounded-md p-2"
+                                        placeholder="Enter variant cost"
+                                        #variantCost="ngModel"
+                                        [required]="enableField"
+                                >
+                                @if (enableField && variantCost.invalid && (variantCost.dirty || variantCost.touched)) {
+                                    <div class="text-red-500 text-sm mt-1">
+                                        Variant cost cannot be empty
+                                    </div>
+                                }
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Variant Unit</label>
+                                <select [(ngModel)]="variant.unit" class="form-input">
+                                    <option selected hidden value="">Select Unit</option>
+                                    <option value="g">G - Gram</option>
+                                    <option value="kg">KG -Kilo Gram</option>
+                                    <option value="pcs">PCS - Peaces</option>
+                                </select>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <!-- Compact Footer -->
+                <div class="border-t border-gray-200 p-3 flex justify-between items-center">
+                    <button
+                            type="button"
+                            (click)="closeModal()"
+                            class="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                    >
+                        Close
+                    </button>
+                    @if (enableField && variant.weight > 0 && variant.basePrice > 0 && variant.cost > 0 && variant.unit) {
+                        <button
+                                (click)="createVariant()"
+                                [disabled]="!enableField"
+                                class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg disabled:opacity-50"
+                        >
+                            Add Variant
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<!--Stock Update-->
+@defer (when $$StockUpdateModal) {
+    @if ($$StockUpdateModal()) {
+        <div class="fixed inset-0 bg-primary-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl w-[480px] max-h-[90vh] overflow-hidden">
+                <!-- Header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold">
+                        {{ productDetailsDTOS[0].productName | titlecase }}
+                    </h2>
+                    <button (click)="closeModal()" class="p-2 hover:bg-gray-100 rounded-full">
+                        <fa-icon [icon]="faXmark"></fa-icon>
+                    </button>
+                </div>
+
+                <div class="flex-grow overflow-y-auto p-4">
+                    <div class="space-y-4">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Product Variant</label>
+                            <select
+                                    [(ngModel)]="selectedVariant"
+                                    (ngModelChange)="onVariantSelect($event)"
+
+                                    class="w-full form-select border rounded-md p-2"
+                            >
+                                <option value="" disabled hidden selected>Select Variant</option>
+                                @for (product of productDetailsDTOS; track product) {
+                                    @for (variant of product.variants; track variant.variantId) {
+                                        <option [ngValue]="variant">
+                                            {{ variant.weight }} {{ variant.unit | titlecase }}
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        @if (!enableField) {
+                            <div class="mb-4">
+                                <label style="pointer-events: none"
+                                       class="block opacity-65 text-sm font-medium text-gray-700 mb-2">Current Available
+                                    Quantity</label>
+                                <input
+                                        type="text"
+                                        disabled
+                                        [value]="selectedVariant?.availableQTY || 0"
+                                        class="opacity-65 w-full form-input border rounded-md p-2"
+                                        readonly
+                                >
+                            </div>
+                            <!-- Stock Quantity Input -->
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Stock Quantity</label>
+                                <input
+                                        type="number"
+                                        [(ngModel)]="stockCreateDTO.stockQty"
+                                        min="0"
+                                        [disabled]="enableField"
+                                        class="w-full form-input border rounded-md p-2"
+                                        placeholder="Enter stock quantity"
+                                        #StockQTY="ngModel"
+                                        required
+                                >
+                                @if (StockQTY.invalid && (StockQTY.dirty || StockQTY.touched)) {
+                                    <div class="text-red-500 text-sm mt-1">
+                                        Stock quantity is required
+                                    </div>
+                                }
+                            </div>
+                        }
+                        <!-- Base Price Section -->
+                        <div class="mb-4 flex items-center">
+                            <input
+                                    type="checkbox"
+                                    [(ngModel)]="enableField"
+                                    (ngModelChange)="onEditBasePriceToggle()"
+                                    class="mr-2 checkbox"
+                                    [disabled]="enableCustomField"
+                                    id="editBasePriceCheckbox"
+                            >
+                            <label for="editBasePriceCheckbox" class="text-sm font-medium text-gray-700">
+                                Edit Base Price
+                            </label>
+                        </div>
+                        <!-- Base Custom Section -->
+                        <div class="mb-4 flex items-center">
+                            <input
+                                    type="checkbox"
+                                    [(ngModel)]="enableCustomField"
+                                    (ngModelChange)="onEditCustomerBasePriceToggle()"
+                                    class="mr-2 checkbox"
+                                    [disabled]="enableField"
+                                    id="editShopCheckBox"
+                            >
+                            <label for="editShopCheckBox" class="text-sm font-medium text-gray-700">
+                                Edit Customer Price
+                            </label>
+                        </div>
+
+                        @if (enableField) {
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Row 1 -->
+                                <div class="mb-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Base Price</label>
+                                    <input readonly
+                                            type="number"
+                                            [(ngModel)]="variantPrice.currentPrice"
+                                            min="0"
+                                            disabled
+                                            class="w-full form-input border rounded-md p-2"
+                                            #basePrice1="ngModel"
+                                            [required]="enableField"
+                                    >
+                                </div>
+                                <div class="mb-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Cost</label>
+                                    <input readonly
+                                            type="number"
+                                            [(ngModel)]="variantPrice.currentCost"
+                                            min="0"
+                                           disabled
+                                            class="w-full form-input border rounded-md p-2"
+                                            #basePrice2="ngModel"
+                                            [required]="enableField"
+                                    >
+                                </div>
+                                <!-- Row 2 -->
+                                <div class="mb-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">New Base Price</label>
+                                    <input
+                                            type="number"
+                                            [(ngModel)]="variantPrice.basePrice"
+                                            min="0"
+                                            [disabled]="!enableField"
+                                            class="w-full form-input border rounded-md p-2"
+                                            placeholder="Enter base price 3"
+                                            #basePrice3="ngModel"
+                                            [required]="enableField"
+                                    >
+                                    @if (enableField && basePrice3.invalid && (basePrice3.dirty || basePrice3.touched)) {
+                                        <div class="text-red-500 text-sm mt-1">
+                                            Base price  is required when editing
+                                        </div>
+                                    }
+                                </div>
+                                <div class="mb-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">New Cost</label>
+                                    <input
+                                            type="number"
+                                            [(ngModel)]="variantPrice.cost"
+                                            min="0"
+                                            [disabled]="!enableField"
+                                            class="w-full form-input border rounded-md p-2"
+                                            placeholder="Enter base price 4"
+                                            #basePrice4="ngModel"
+                                            [required]="enableField"
+                                    >
+                                </div>
+                            </div>
+                        }
+
+                        @if (enableCustomField) {
+
+                            <div class="mb-4">
+                                <div class="relative w-full">
+                                    <app-customer-search (shopSelected)="onShopSelected($event)"></app-customer-search>
+                                </div>
+
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Customer Price</label>
+                                <input
+                                        type="number"
+                                        [(ngModel)]="price.priceValue"
+                                        min="0"
+                                        [disabled]="!enableCustomField"
+                                        class="w-full form-input border rounded-md p-2"
+                                        placeholder="Enter customer price"
+                                        #basePrice="ngModel"
+                                        [required]="enableField"
+                                >
+                                @if (enableField && basePrice.invalid && (basePrice.dirty || basePrice.touched)) {
+                                    <div class="text-red-500 text-sm mt-1">
+                                        Customer price is required when editing
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+                <!-- Footer with Update Button -->
+                <div class="border-t border-gray-200 p-3 flex justify-between items-center">
+                    <button
+                            type="button"
+                            (click)="closeModal()"
+                            class="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                    >
+                        Close
+                    </button>
+                    <button
+                            (click)="enableField ? updateBasePrice() : (enableCustomField ? updatePrice() : updateStock())"
+                            class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg disabled:opacity-50"
+                    >
+                        {{ enableField ? 'Update Base Price' : (enableCustomField ? 'Update Customer Price' : 'Update Stock') }}
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    }
+}

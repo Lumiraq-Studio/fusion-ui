@@ -1,0 +1,76 @@
+{
+  "data": {
+    "purchaseOrderId": 16844,
+    "deliveryDate": "2020-10-01",
+    "poAddress": 1638,
+    "purchaseType": "dp",
+    "poDate": "2020-10-01",
+    "paymentTerm": "cr",
+    "specialInstruction": "",
+    "poNo": "PO202010/016779",
+    "subTotal": "500.00",
+    "poVlue": "500.00",
+    "poStatus": "N",
+    "poExchangeRate": "1.00",
+    "supplier": {
+      "shortCode": "Weera",
+      "supplierId": 598,
+      "supplierCode": "W020",
+      "supplierName": "Weera Industries (PVT) Ltd",
+      "supplierCodePrefix": "90100"
+    },
+    "attentionPerson": null,
+    "taxGroup": null,
+    "deliveryLocation": {
+      "warehouseId": 1,
+      "warehouseCode": "Central",
+      "warehouseName": "Central Warehouse Impressions Labels Lanka",
+      "warehouseAddress": "62/4, Ranala Road,\r\nHabarakada,"
+    },
+    "currency": {
+      "currencyId": 1,
+      "currencyCode": "LKR",
+      "currencyName": "Sri Lankan Rupee"
+    },
+
+    "purchaseOrderItems": [
+      {
+        "size": "",
+        "unit": 9,
+        "styleNo": "",
+        "quantity": 1,
+        "unitPrice": 500,
+        "description": "MRP__PP/196042 ",
+        "inventoryItem": {
+          "quantityOnHand": 1606,
+          "inventoryItemId": 2666,
+          "reOrderQuantity": 1,
+          "inventoryItemCode": "GTO Plate",
+          "inventoryItemName": "GTO Plate",
+          "inventoryItemDescription": "GTO Plate"
+        },
+        "purchaseItemId": 60414,
+        "receivedQuantity": 0
+      },
+
+      {
+        "size": "",
+        "unit": 9,
+        "styleNo": "",
+        "quantity": 1,
+        "unitPrice": 500,
+        "description": "MRP__PP/196042 ",
+        "inventoryItem": {
+          "quantityOnHand": 1606,
+          "inventoryItemId": 2666,
+          "reOrderQuantity": 1,
+          "inventoryItemCode": "GTO Plate",
+          "inventoryItemName": "GTO Plate",
+          "inventoryItemDescription": "GTO Plate"
+        },
+        "purchaseItemId": 60414,
+        "receivedQuantity": 0
+      }
+    ]
+  }
+}

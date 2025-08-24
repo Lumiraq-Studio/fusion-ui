@@ -1,0 +1,4 @@
+@use '../../../shared/styles/mixins' as m;
+
+@include m.common();
+@include m.allButtons();

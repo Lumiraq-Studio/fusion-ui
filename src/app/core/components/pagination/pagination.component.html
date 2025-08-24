@@ -1,0 +1,44 @@
+<nav class="flex items-center justify-between pt-4" aria-label="Table navigation">
+    <span class="text-sm font-normal text-primary-200 block w-full md:inline md:w-auto">
+        Showing
+        <span class="font-semibold text-primary-400">{{ startItem }}</span>
+        to
+        <span class="font-semibold text-primary-400">{{ endItem }}</span>
+        of
+        <span class="font-semibold text-primary-400">{{ totalItems }}</span>
+        entries
+    </span>
+    <ul class="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
+        <li>
+            <button (click)="goToPreviousPage()"
+                    [disabled]="currentPage === 1"
+                    class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-primary-200 bg-white border border-primary-100 rounded-s-lg transition-colors"
+                    [ngClass]="currentPage === 1 ?
+                              'cursor-not-allowed opacity-50' :
+                              'hover:bg-primary-50 hover:text-primary-400'">
+                Previous
+            </button>
+        </li>
+        @for (pageNumber of visiblePageNumbers; track pageNumber) {
+            <li>
+                <button (click)="goToPage(pageNumber)"
+                        class="flex items-center justify-center px-3 h-8 border transition-colors"
+                        [ngClass]="pageNumber === currentPage ?
+                  'text-white border-primary-300 bg-primary-400 hover:bg-primary-500' :
+                  'text-primary-200 bg-white border-primary-100 hover:bg-primary-50 hover:text-primary-400'">
+                    {{ pageNumber }}
+                </button>
+            </li>
+        }
+        <li>
+            <button (click)="goToNextPage()"
+                    [disabled]="currentPage === totalPages"
+                    class="flex items-center justify-center px-3 h-8 leading-tight text-primary-200 bg-white border border-primary-100 rounded-e-lg transition-colors"
+                    [ngClass]="currentPage === totalPages ?
+                              'cursor-not-allowed opacity-50' :
+                              'hover:bg-primary-50 hover:text-primary-400'">
+                Next
+            </button>
+        </li>
+    </ul>
+</nav>

@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # Development UI
+  ui-dev:
+    container_name: fusion-erp-ui-dev
+    build:
+      context: /home/development/navoda/fusion-ui/dev  # Path to dev UI build context
+      args:
+        CONFIGURATION: "development" # Pass the development build configuration to the Dockerfile
+    ports:
+      - "4200:80"  # Map host port 4200 to container port 80
+    environment:
+      NODE_ENV: development
+      API_URL: https://api.dev.navoda.fusion.lumiraq.com  # Dev API URL
+    networks:
+      - web  # Connect to the 'web' network
+    deploy:
+      resources:
+        limits:
+          memory: 512M          # Maximum Ram
+          cpus: "0.25"         # Limit CPU usage
+        reservations:
+          memory: 256M  # Reserved memory
+          cpus: "0.1"       # CPU reserved
+
+
+  # Production UI
+  ui-release:
+    container_name: fusion-erp-ui-release
+    build:
+      context: /home/development/navoda/fusion-ui/prod  # Path to prod UI build context
+      args:
+        CONFIGURATION: "production"  # Pass the production build configuration to the Dockerfile
+    ports:
+      - "4300:80"  # Map host port 4300 to container port 80
+    environment:
+      NODE_ENV: production
+      API_URL: https://api.navoda.fusion.lumiraq.com  # Prod API URL
+    networks:
+      - web  # Connect to the 'web' network
+    deploy:
+      resources:
+        limits:
+          memory: 1G          # Maximum Ram
+          cpus: "1"           # Limit CPU usage
+        reservations:
+          memory: 512M          # Ram reserved
+          cpus: "0.5"         # CPU reserved
+
+networks:
+  web:
+    driver: bridge  # Use the bridge driver for network communication

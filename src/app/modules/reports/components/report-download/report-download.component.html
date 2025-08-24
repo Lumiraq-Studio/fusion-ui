@@ -1,0 +1,182 @@
+<div class="p-6">
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold">Reports</h1>
+    </div>
+
+    <div class="flex gap-4">
+        <div class="w-64 flex-shrink-0">
+            <div class="bg-white rounded-lg border border-primary-100 overflow-hidden">
+                <nav class="flex flex-col p-2">
+                    <button (click)="setReportType('sales')"
+                            class="flex items-center gap-3 px-3 py-2 rounded text-left text-sm font-medium"
+                            [ngClass]="{'bg-primary-50 text-primary-900': isActiveReportType('sales'), 'text-primary-700 hover:bg-primary-50': !isActiveReportType('sales')}">
+                        <fa-icon [icon]="faChartBar" class="text-primary-500"></fa-icon>
+                        Sales Reports
+                    </button>
+                    <button (click)="setReportType('customer')"
+                            class="flex items-center gap-3 px-3 py-2 rounded text-left text-sm font-medium"
+                            [ngClass]="{'bg-primary-50 text-primary-900': isActiveReportType('customer'), 'text-primary-700 hover:bg-primary-50': !isActiveReportType('customer')}">
+                        <fa-icon [icon]="faUsers" class="text-primary-500"></fa-icon>
+                        Customer Reports
+                    </button>
+<!--                    <button-->
+<!--                            class="flex items-center gap-3 px-3 py-2 rounded text-left text-sm font-medium"-->
+<!--                            [ngClass]="{'bg-primary-50 text-primary-900': isActiveReportType('inventory'), 'text-primary-700 hover:bg-primary-50': !isActiveReportType('inventory')}">-->
+<!--                        <fa-icon [icon]="faBoxes" class="text-primary-500"></fa-icon>-->
+<!--                        Inventory Reports-->
+<!--                    </button>-->
+<!--                    <button-->
+<!--                            class="flex items-center gap-3 px-3 py-2 rounded text-left text-sm font-medium"-->
+<!--                            [ngClass]="{'bg-primary-50 text-primary-900': isActiveReportType('financial'), 'text-primary-700 hover:bg-primary-50': !isActiveReportType('financial')}">-->
+<!--                        <fa-icon [icon]="faMoneyBill" class="text-primary-500"></fa-icon>-->
+<!--                        Financial Reports-->
+<!--                    </button>-->
+                </nav>
+            </div>
+        </div>
+
+        <div class="flex-1">
+            <div class="bg-white rounded-lg border border-primary-100 p-6">
+                <div class="flex justify-between items-center gap-4 mb-6">
+                    <h2 class="text-lg font-semibold whitespace-nowrap">{{ reportTitle }}</h2>
+                    <button class="btn btn-primary whitespace-nowrap"
+                            [class.btn-gray]="isError()"
+                            [disabled]="isError()"
+                            (click)="download()">
+                        <fa-icon [icon]="faDownload" class="mr-2"></fa-icon>
+                        Generate Report
+                    </button>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Report Parameters -->
+                    <div class="border-b border-primary-100 pb-6">
+                        <h3 class="text-sm font-medium mb-4">REPORT PARAMETERS</h3>
+                        @if (isActiveReportType('sales')) {
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm mb-1">Sales Rep</label>
+                                    <select class="form-select w-full" (change)="onSalesRepChange($event)">
+                                        <option value="" disabled hidden selected>Select a Sales Person</option>
+                                        @for (person of salesPersonService.all(); track person.id) {
+                                            <option [value]="person.id">{{ person.name }}</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">Route</label>
+                                    <select class="form-select w-full" (change)="onRouteChange($event)">
+                                        <option value="" disabled hidden selected>Select a Route</option>
+                                        @for (route of routeService.all(); track route.id) {
+                                            <option [value]="route.id">{{ route.name }}</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">Select Customer</label>
+                                    <app-customer-search
+                                            (shopSelected)="onCustomerSelected($event)"
+                                            class="w-full">
+                                    </app-customer-search>
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">Order Status</label>
+                                    <select class="form-select w-full" (change)="onOrderStatusChange($event)">
+                                        <option value="" disabled hidden selected>Select Order Status</option>
+                                        <option value="paid">PAID</option>
+                                        <option value="completed">COMPLETED</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">Start Date</label>
+                                    <input type="date"
+                                           [(ngModel)]="SalesOrderReport.startDate"
+                                           name="startDate"
+                                           required
+                                           #startDate="ngModel"
+                                           class="form-input w-full"
+                                           [ngClass]="{'border-red-500': startDate.invalid && (startDate.dirty || startDate.touched)}">
+
+                                    @if (startDate.invalid && (startDate.dirty || startDate.touched)) {
+                                        <p class="text-red-500 text-sm mt-1">Start date is required</p>
+                                    }
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">End Date</label>
+                                    <input type="date"
+                                           [(ngModel)]="SalesOrderReport.endDate"
+                                           name="endDate"
+                                           required
+                                           #endDate="ngModel"
+                                           class="form-input w-full"
+                                           [ngClass]="{'border-red-500': endDate.invalid && (endDate.dirty || endDate.touched)}">
+
+                                    @if (endDate.invalid && (endDate.dirty || endDate.touched)) {
+                                        <p class="text-red-500 text-sm mt-1">End date is required</p>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Customer Report Parameters -->
+                        @if (isActiveReportType('customer')) {
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm mb-1">Route</label>
+                                    <select class="form-select w-full" (change)="onRouteChange($event)">
+                                        <option value="" disabled hidden selected>Select a Route</option>
+                                        @for (route of routeService.all(); track route.id) {
+                                            <option [value]="route.id">{{ route.name }}</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                        }
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="w-80 flex-shrink-0 hidden">
+            <div class="bg-white rounded-lg border border-primary-100 p-6 space-y-6">
+                <div>
+                    <h3 class="text-sm font-medium mb-4">RECENT REPORTS</h3>
+                    <div class="space-y-4">
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                <fa-icon [icon]="faFileAlt" class="text-blue-600"></fa-icon>
+                            </div>
+                            <div>
+                                <div class="text-sm">Monthly Sales Report</div>
+                                <div class="text-xs text-primary-400">Generated 2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                                <fa-icon [icon]="faFileAlt" class="text-green-600"></fa-icon>
+                            </div>
+                            <div>
+                                <div class="text-sm">Inventory Status Report</div>
+                                <div class="text-xs text-primary-400">Generated 1 day ago</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                                <fa-icon [icon]="faFileAlt" class="text-orange-600"></fa-icon>
+                            </div>
+                            <div>
+                                <div class="text-sm">Customer Analysis Report</div>
+                                <div class="text-xs text-primary-400">Generated 2 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

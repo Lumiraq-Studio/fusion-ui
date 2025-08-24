@@ -1,0 +1,113 @@
+<div class="flex">
+    <div class="flex-1 p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold">Sales Orders</h1>
+        </div>
+
+        <div class="flex gap-3 mb-6">
+            <div class="relative">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                    <fa-icon [icon]="faSearch" class="text-primary-200"></fa-icon>
+                </div>
+                <input type="text" [(ngModel)]="searchParams.order_reference" placeholder="Search Reference"
+                       class="ps-10 form-input">
+            </div>
+
+            <div class="relative">
+                <select class="form-input" [(ngModel)]="searchParams.order_status">
+                    <option value="" hidden selected disabled>Select Status</option>
+                    <option value="">All</option>
+                    <option value="unpaid">Unpaid</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+
+            <div class="relative">
+                <input type="date" [(ngModel)]="searchParams.order_date" placeholder="Order Date"
+                       class="form-input">
+            </div>
+            <div class="relative">
+                <select class="form-input" [(ngModel)]="searchParams.sales_rep_name">
+                    <option value="" hidden selected disabled>Select Sales Person</option>
+                    <option value="">All Persons</option>
+                    @for (person of salesPersonService.all(); track person) {
+                        <option [value]="person.name">{{ person.name }}</option>
+                    }
+                </select>
+            </div>
+            <div class="relative">
+                <button class="btn btn-primary" (click)="searchOrder()">
+                    <fa-icon [icon]="faSearch" class="mr-2"></fa-icon>
+                    Search
+                </button>
+            </div>
+
+            <button class="btn btn-primary whitespace-nowrap ml-auto" (click)="$$orderCreate.set(true)">
+                New Order
+                <fa-icon [icon]="faPlus" class="ml-2"></fa-icon>
+            </button>
+
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg border border-primary-100 p-4">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="mb-6">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Order Reference</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Customer</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Status</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Sales Person</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Order Date</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Order Time</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Amount</th>
+                        <th class="w-10 p-4"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-primary-100">
+                        @for (order of orderService.all(); track order) {
+                            <tr class="hover:bg-primary-50">
+                                <td class="px-4 py-3 text-sm">{{ order.orderReference }}</td>
+                                <td class="px-4 py-3 text-sm">{{ order.customerName | titlecase }}</td>
+                                <td class="px-4 py-3">
+                                    <app-status-badge [status]="order.status"></app-status-badge>
+                                </td>
+                                <td class="px-4 py-3 text-sm">{{ order.salesRepName | titlecase }}</td>
+                                <td class="px-4 py-3 text-sm">{{ order.orderDate }}</td>
+                                <td class="px-4 py-3 text-sm">{{ order.orderTime }}</td>
+                                <td class="px-4 py-3 text-sm">Rs.{{ order.orderAmount }}</td>
+                                <td class="p-4">
+                                    <button (click)="handleClick(order.orderId)"
+                                            class="p-1 hover:bg-primary-100 rounded">
+                                        <fa-icon [icon]="faEllipsisV"></fa-icon>
+                                    </button>
+                                </td>
+                            </tr>
+
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            <app-pagination [totalItems]="totalItems" [itemsPerPage]="itemsPerPage"
+                            (pageChanged)="onPageChange($event)"></app-pagination>
+        </div>
+    </div>
+    <app-order-summery-panel class="hidden sm:block"></app-order-summery-panel>
+</div>
+
+
+@defer (when $$orderCreate()) {
+    <app-order-create-modal
+            [isOpen]="$$orderCreate()"
+            (closePopup)="$$orderCreate.set(false)">
+    </app-order-create-modal>
+}
+
+@defer (when $$orderDetail()) {
+    <app-order-view-modal
+            [isOpen]="$$orderDetail()"
+            (closePopup)="$$orderDetail.set(false)">
+    </app-order-view-modal>
+}

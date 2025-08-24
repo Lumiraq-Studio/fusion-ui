@@ -1,0 +1,18 @@
+.social-btn {
+  @apply flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm font-medium hover:bg-gray-50;
+}
+
+.btn-custom {
+  @apply w-full bg-primary-900 text-white rounded-md px-3 py-2.5 text-sm font-medium hover:bg-primary-500 transition-colors;
+}
+
+.input-form {
+  @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-gray-600 focus:ring-1 focus:border-none block w-full ps-10 p-2.5;
+}
+
+.btn-custom {
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}

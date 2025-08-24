@@ -1,0 +1,44 @@
+<div class="relative">
+    <input
+            type="text"
+            [ngModel]="searchText()"
+            (ngModelChange)="filterShops($event)"
+            (focus)="isListVisible.set(true)"
+            (click)="$event.stopPropagation()"
+            class="form-input"
+            [placeholder]="selectedShop() ? searchText() : 'Search Customer'"
+    />
+    <div class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+        <svg
+                class="w-4 h-4 pointer-events-none"
+                [class.transform]="isListVisible()"
+                [class.rotate-180]="isListVisible()"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+        >
+            <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+            />
+        </svg>
+    </div>
+    @if (isListVisible()) {
+        <ul class="absolute z-30 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+            @for (shop of filteredShops(); track shop.id) {
+                <li
+                        (click)="handleShopChange(shop, $event)"
+                        class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                        [class.bg-blue-50]="shop.id === selectedShop()?.id"
+                >
+                    {{ shop.cRef }} - {{ shop.shortName || shop.fullName }}
+                </li>
+            }
+            @if (filteredShops().length === 0) {
+                <li class="px-4 py-2 text-gray-500 text-sm">Search Shop</li>
+            }
+        </ul>
+    }
+</div>

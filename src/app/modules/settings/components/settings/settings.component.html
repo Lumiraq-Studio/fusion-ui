@@ -1,0 +1,199 @@
+<div class="p-6">
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold">Settings</h1>
+        <p class="text-sm text-primary-500">Manage your system preferences and configurations</p>
+    </div>
+
+    <div class="flex gap-6">
+        <!-- Left Navigation -->
+        <div class="w-64 flex-shrink-0">
+            <div class="bg-white rounded-lg border border-primary-100 overflow-hidden">
+                <nav class="flex flex-col p-2">
+                    <button class="flex items-center gap-3 px-3 py-2 rounded text-left text-sm font-medium bg-primary-50 text-primary-900">
+                        <fa-icon [icon]="faStore" class="text-primary-500"></fa-icon>
+                        Business Profile
+                    </button>
+                    <button class="flex items-center gap-3 px-3 py-2 rounded text-left text-sm font-medium text-primary-700 hover:bg-primary-50">
+                        <fa-icon [icon]="faUsers" class="text-primary-500"></fa-icon>
+                        User Management
+                    </button>
+                    <button class="flex items-center gap-3 px-3 py-2 rounded text-left text-sm font-medium text-primary-700 hover:bg-primary-50">
+                        <fa-icon [icon]="faCreditCard" class="text-primary-500"></fa-icon>
+                        Payment Settings
+                    </button>
+                    <button class="flex items-center gap-3 px-3 py-2 rounded text-left text-sm font-medium text-primary-700 hover:bg-primary-50">
+                        <fa-icon [icon]="faTruck" class="text-primary-500"></fa-icon>
+                        Shipping Options
+                    </button>
+                    <button class="flex items-center gap-3 px-3 py-2 rounded text-left text-sm font-medium text-primary-700 hover:bg-primary-50">
+                        <fa-icon [icon]="faReceipt" class="text-primary-500"></fa-icon>
+                        Invoice Settings
+                    </button>
+                    <button class="flex items-center gap-3 px-3 py-2 rounded text-left text-sm font-medium text-primary-700 hover:bg-primary-50">
+                        <fa-icon [icon]="faBell" class="text-primary-500"></fa-icon>
+                        Notifications
+                    </button>
+                    <button class="flex items-center gap-3 px-3 py-2 rounded text-left text-sm font-medium text-primary-700 hover:bg-primary-50">
+                        <fa-icon [icon]="faShieldAlt" class="text-primary-500"></fa-icon>
+                        Security
+                    </button>
+                    <button class="flex items-center gap-3 px-3 py-2 rounded text-left text-sm font-medium text-primary-700 hover:bg-primary-50">
+                        <fa-icon [icon]="faDatabase" class="text-primary-500"></fa-icon>
+                        Backup & Restore
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1">
+            <!-- Business Profile Section -->
+            <div class="bg-white rounded-lg border border-primary-100 p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-semibold">Business Profile</h2>
+                    <button class="btn btn-primary">
+                        <fa-icon [icon]="faSave" class="mr-2"></fa-icon>
+                        Save Changes
+                    </button>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Company Logo -->
+                    <div class="border-b border-primary-100 pb-6">
+                        <h3 class="text-sm font-medium mb-4">COMPANY LOGO</h3>
+                        <div class="flex items-center gap-4">
+                            <div class="w-24 h-24 rounded-lg border-2 border-dashed border-primary-200 flex items-center justify-center">
+                                <fa-icon [icon]="faImage" class="text-4xl text-primary-300"></fa-icon>
+                            </div>
+                            <div>
+                                <button class="btn btn-outline-primary mb-2">
+                                    <fa-icon [icon]="faUpload" class="mr-2"></fa-icon>
+                                    Upload Logo
+                                </button>
+                                <div class="text-xs text-primary-400">
+                                    Recommended: 400x400px, Max 2MB
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Information -->
+                    <div class="border-b border-primary-100 pb-6">
+                        <h3 class="text-sm font-medium mb-4">BUSINESS INFORMATION</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm mb-1">Business Name</label>
+                                <input type="text" class="form-input w-full" value="My Company Name">
+                            </div>
+                            <div>
+                                <label class="block text-sm mb-1">Registration Number</label>
+                                <input type="text" class="form-input w-full" value="REG123456">
+                            </div>
+                            <div>
+                                <label class="block text-sm mb-1">Email Address</label>
+                                <input type="email" class="form-input w-full" value="contact@mycompany.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm mb-1">Phone Number</label>
+                                <input type="tel" class="form-input w-full" value="+94 123 456 789">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm mb-1">Business Address</label>
+                                <textarea class="form-input w-full" rows="3">123 Main Street, City</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tax Information -->
+                    <div class="border-b border-primary-100 pb-6">
+                        <h3 class="text-sm font-medium mb-4">TAX INFORMATION</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm mb-1">Tax ID Number</label>
+                                <input type="text" class="form-input w-full" value="TAX123456">
+                            </div>
+                            <div>
+                                <label class="block text-sm mb-1">VAT Rate (%)</label>
+                                <input type="number" class="form-input w-full" value="15">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Info Panel -->
+        <div class="w-80 flex-shrink-0">
+            <div class="bg-white rounded-lg border border-primary-100 p-6 space-y-6">
+                <!-- Activity Log -->
+                <div>
+                    <h3 class="text-sm font-medium mb-4">RECENT ACTIVITY</h3>
+                    <div class="space-y-4">
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                <fa-icon [icon]="faUser" class="text-blue-600"></fa-icon>
+                            </div>
+                            <div>
+                                <div class="text-sm">Profile updated</div>
+                                <div class="text-xs text-primary-400">2 minutes ago</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                                <fa-icon [icon]="faUserPlus" class="text-green-600"></fa-icon>
+                            </div>
+                            <div>
+                                <div class="text-sm">New user added</div>
+                                <div class="text-xs text-primary-400">1 hour ago</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                                <fa-icon [icon]="faCog" class="text-orange-600"></fa-icon>
+                            </div>
+                            <div>
+                                <div class="text-sm">Settings changed</div>
+                                <div class="text-xs text-primary-400">3 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Status -->
+                <div class="pt-6 border-t border-primary-100">
+                    <h3 class="text-sm font-medium mb-4">SYSTEM STATUS</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <div class="text-sm">System Version</div>
+                            <div class="text-sm font-medium">v2.1.0</div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="text-sm">Last Backup</div>
+                            <div class="text-sm font-medium">2 hours ago</div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="text-sm">Storage Used</div>
+                            <div class="text-sm font-medium">1.2 GB / 5 GB</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Help -->
+                <div class="pt-6 border-t border-primary-100">
+                    <h3 class="text-sm font-medium mb-4">NEED HELP?</h3>
+                    <div class="space-y-3">
+                        <button class="w-full btn btn-outline-primary">
+                            <fa-icon [icon]="faBook" class="mr-2"></fa-icon>
+                            View Documentation
+                        </button>
+                        <button class="w-full btn btn-outline-primary">
+                            <fa-icon [icon]="faHeadset" class="mr-2"></fa-icon>
+                            Contact Support
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

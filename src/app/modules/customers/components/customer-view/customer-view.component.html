@@ -1,0 +1,381 @@
+<div class="flex">
+    <div class="flex-1 p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold">Customers</h1>
+        </div>
+
+        <div class="flex flex-wrap justify-between gap-3 mb-6">
+            <div class="flex flex-1 gap-3">
+                <div class="relative">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                        <fa-icon [icon]="faSearch" class="text-primary-200"></fa-icon>
+                    </div>
+                    <input type="search" placeholder="Search customers" [(ngModel)]="searchTerm"
+                           class="ps-10 form-input">
+                </div>
+
+                <div class="relative">
+                    <select [(ngModel)]="searchParams.route" class="w-fit form-input">
+                        <option selected value="">All Routes</option>
+                        @for (route of routesResultDTOS; track route.id) {
+
+                            <option [value]="route.id">{{ route.name | titlecase }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="relative">
+                    <button class="btn btn-primary whitespace-nowrap ml-auto" (click)="this.fetchCustomers()">
+                        <fa-icon [icon]="faSearch" class="mr-2"></fa-icon>
+                        Search
+                    </button>
+                </div>
+                <button class="btn btn-primary whitespace-nowrap ml-auto" (click)="$$CreateModal.set(true)">
+                    Add Customer
+                    <fa-icon [icon]="faPlus" class="ml-2"></fa-icon>
+                </button>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg border border-primary-50 p-4">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="mb-6">
+                    <tr>
+<!--                        <th class="w-4 p-4">-->
+<!--                            <input type="checkbox" class="checkbox">-->
+<!--                        </th>-->
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Shop Type</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Reference</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Full Name</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Route</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600 sm:block hidden ">Contact</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Status</th>
+                        <th class="w-10 p-4"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-primary-50">
+                        @if (customerDataDTOS?.length) {
+                            @for (customer of customerDataDTOS; track customer.id) {
+                                <tr class="hover:bg-primary-50">
+<!--                                    <td class="w-4 p-4">-->
+<!--                                        <input type="checkbox" class="checkbox">-->
+<!--                                    </td>-->
+                                    <td class="px-4 py-2 text-sm whitespace-nowrap">{{ customer.shopType }}</td>
+                                    <td class="px-4 py-2 text-sm whitespace-nowrap">{{ customer.cRef }}</td>
+                                    <td class="px-4 py-2 text-sm">{{ customer.fullName | titlecase }}
+                                    <td class="px-4 py-2 text-sm">{{ customer.routeName | titlecase }}</td>
+                                    <td class="px-4 py-2 text-sm sm:block hidden">{{ customer.contact || '-' }}</td>
+                                    <td class="px-4 py-3">
+                                        <app-status-badge [status]="customer.status"></app-status-badge>
+                                    </td>
+                                    <td class="p-2">
+                                        <button class="p-1 hover:bg-primary-100 rounded"
+                                                (click)="(this.$$CreateModal.set(true)); handleClick(customer.id||0)">
+                                            <fa-icon [icon]="faEllipsisV"></fa-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <app-pagination [totalItems]="totalItems" [itemsPerPage]="itemsPerPage"
+                            (pageChanged)="onPageChange($event)"></app-pagination>
+        </div>
+    </div>
+
+    <!-- Right summary panel -->
+    <div class="w-80 border-l sm:block hidden border-primary-100 p-6 bg-white min-h-screen">
+        <div class="space-y-6 divide-y divide-primary-100">
+            <div class="pb-6">
+                <h2 class="text-sm font-medium mb-4">CUSTOMER OVERVIEW</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-2xl font-semibold">{{ customerSummaryDTOS[0]?.totalShops}}</div>
+                        <div class="text-sm text-primary-400">Total Customers</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-semibold">{{ customerSummaryDTOS[0]?.newThisMonth}}</div>
+                        <div class="text-sm text-primary-400">New This Month</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="py-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-sm font-medium">CUSTOMER STATUS</h2>
+                    <button class="text-sm text-primary-600">This month</button>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                            <span class="text-sm">Active</span>
+                        </div>
+                        <span class="text-sm">{{ customerSummaryDTOS[0]?.activePercentage}}%</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-orange-500"></div>
+                            <span class="text-sm">Inactive</span>
+                        </div>
+                        <span class="text-sm">{{ customerSummaryDTOS[0]?.inactivePercentage}}%</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Customer Create popup-->
+@defer (when $$CreateModal) {
+    @if ($$CreateModal()) {
+        <div class="fixed inset-0 bg-primary-600 bg-opacity-50 flex items-center justify-center z-40">
+            <div class="bg-white rounded-lg shadow-xl w-[480px] max-h-[90vh] overflow-hidden">
+                <!-- Header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold">
+                        @if ($$UpdateMode()) {
+                            Update Customer
+                        } @else {
+                            Create New Customer
+                        }
+                    </h2>
+                    <button (click)="closeModal()" class="p-2 hover:bg-gray-100 rounded-full">
+                        <fa-icon [icon]="faXmark"></fa-icon>
+                    </button>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                    <div class="space-y-4">
+                        <!-- Full Name Field -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                            <input
+                                    [(ngModel)]="customer.fullName"
+                                    type="text"
+                                    class="w-full form-input"
+                                    placeholder="Enter full name"
+                                    #fullNameInput="ngModel"
+                                    required
+                                    minlength="3"
+                            >
+                            @if (fullNameInput.invalid && (fullNameInput.dirty || fullNameInput.touched)) {
+                                <div class="text-red-500 text-sm mt-1">
+                                    @if (fullNameInput.errors?.['required']) {
+                                        Full Name is required
+                                    }
+                                    @if (fullNameInput.errors?.['minlength']) {
+                                        Full Name must be at least 3 characters
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Shop Name Field -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Short Name</label>
+                            <input
+                                    [(ngModel)]="customer.shortName"
+                                    type="text"
+                                    class="w-full form-input"
+                                    placeholder="Enter shop name"
+                            >
+                        </div>
+
+                        <!-- Address Field -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                            <textarea
+                                    [(ngModel)]="customer.address"
+                                    rows="2"
+                                    class="w-full form-input resize-none"
+                                    placeholder="Enter full address"
+                                    #addressInput="ngModel"
+                                    maxlength="500"
+                            ></textarea>
+                            @if (addressInput.invalid && (addressInput.dirty || addressInput.touched)) {
+                                <div class="text-red-500 text-sm mt-1">
+                                    @if (addressInput.errors?.['maxlength']) {
+                                        Address cannot exceed 500 characters
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Mobile Number Field -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Number</label>
+                            <input
+                                    [(ngModel)]="customer.mobile"
+                                    type="tel"
+                                    class="w-full form-input"
+                                    placeholder="Enter mobile number"
+                                    #mobileInput="ngModel"
+                                    pattern="^[+]?[1-9]{9,14}$"
+                            >
+                            @if (mobileInput.invalid && (mobileInput.dirty || mobileInput.touched)) {
+                                <div class="text-red-500 text-sm mt-1">
+                                    @if (mobileInput.errors?.['required']) {
+                                        Mobile Number is required
+                                    }
+                                    @if (mobileInput.errors?.['pattern']) {
+                                        Invalid mobile number format
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Route Field -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Route</label>
+                            <select
+                                    [(ngModel)]="customer.routeId"
+                                    class="form-input w-full"
+                                    #routeInput="ngModel"
+                                    required
+                            >
+                                @for (route of routeService.all(); track route.id) {
+                                    <option [value]="route.id">{{ route.name | titlecase }}</option>
+                                }
+                            </select>
+                            @if (routeInput.invalid && (routeInput.dirty || routeInput.touched)) {
+                                <div class="text-red-500 text-sm mt-1">
+                                    @if (routeInput.errors?.['required']) {
+                                        Route selection is required
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Customer Status</label>
+
+                            <select
+                                    [(ngModel)]="customer.status"
+                                    class="form-input w-full"
+                                    #statusInput="ngModel"
+                                    required
+                            >
+                                <option value="" hidden disabled>Select a status</option>
+
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+
+                            @if (statusInput.invalid && (statusInput.dirty || statusInput.touched)) {
+                                <div class="text-red-500 text-sm mt-1">
+                                    @if (statusInput.errors?.['required']) {
+                                        Customer status selection is required
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="border-t border-gray-200 pt-4 mt-6 flex justify-end gap-3">
+                        <button
+                                type="button"
+                                (click)="closeModal()"
+                                class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                                (click)="CreateCustomer()"
+                                [disabled]="!isFormValid()"
+                                class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg disabled:opacity-50"
+                        >
+                            @if ($$UpdateMode()) {
+                                Update Customer
+                            } @else {
+                                Create Customer
+                            }
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+
+<!--Customer Prices popup-->
+@defer (when $$PricesModal) {
+    @if ($$PricesModal()) {
+        <div class="fixed inset-0 bg-primary-600 bg-opacity-50 flex items-center justify-center z-40">
+            <div class="bg-white rounded-lg shadow-xl w-fit max-h-[90vh] overflow-hidden">
+                <!-- Header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold">
+                        Pricing for {{ customer.fullName }}
+                    </h2>
+                    <button (click)="closePricesModal()" class="p-2 hover:bg-gray-100 rounded-full">
+                        <fa-icon [icon]="faXmark"></fa-icon>
+                    </button>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                    <div class="space-y-4">
+                        <!-- Product Pricing Table -->
+                        <table class="w-full border-collapse">
+                            <thead>
+                            <tr class="bg-primary-50">
+                                <th class="px-4 py-2 text-left text-sm font-medium">Product</th>
+                                <th class="px-4 py-2 text-center text-sm font-medium">1 kg</th>
+                                <th class="px-4 py-2 text-center text-sm font-medium">2 kg</th>
+                                <th class="px-4 py-2 text-center text-sm font-medium">3 kg</th>
+                                <th class="px-4 py-2 text-center text-sm font-medium">4 kg</th>
+                                <th class="px-4 py-2 text-center text-sm font-medium">5 kg</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @for (productGroup of variantResultDTOS; track productGroup.name) {
+                                    <tr class="border-b border-primary-50 hover:bg-primary-25">
+                                        <td class="px-4 py-2 text-sm font-medium">{{productGroup.name}}</td>
+                                        @for (variant of productGroup.variants; track variant.unit) {
+                                            <td class="px-4 py-2 text-sm text-center">
+                                                <input
+                                                        type="number"
+                                                        class="w-20 form-input text-center"
+                                                        placeholder="Price"
+                                                        [value]="variant.basePrice"
+                                                >
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="border-t border-gray-200 pt-4 mt-6 flex justify-end gap-3">
+                        <button
+                                type="button"
+                                (click)="closePricesModal()"
+                                class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                                (click)="savePrices()"
+                                class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg"
+                        >
+                            Save Prices
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
