@@ -1,6 +1,6 @@
 services:
-  fusion-ui-dev:
-    container_name: fusion-ui-dev
+  navoda-ui-dev:
+    container_name: navoda-ui-dev
     restart: always
     build:
       context: .
@@ -12,8 +12,8 @@ services:
     profiles:
       - development
 
-  fusion-ui-prod:
-    container_name: fusion-ui-prod
+  navoda-ui-prod:
+    container_name: navoda-ui-prod
     restart: always
     build:
       context: .
