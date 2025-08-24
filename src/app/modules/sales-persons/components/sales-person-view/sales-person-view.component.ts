@@ -231,6 +231,15 @@ export class SalesPersonViewComponent {
         this.fetchSalesPeople();
     }
 
+    get salesTeamSummary(): SalesTeamSummaryDTO | undefined {
+        return this.salesTeamSummaryDTOS[0];
+    }
+
+    get salesRepStock(): SalesRepStockDto | undefined {
+        return this.SalesRepStock[0];
+    }
+
+
     openCreateModel(id: number) {
         const selectedPerson = this.SalePersonDTOS.find(person => person.id === id);
         if (selectedPerson) {

@@ -231,6 +231,9 @@ export class CustomerViewComponent {
         this.$$UpdateMode.set(false);
     }
 
+    get customerSummary(): CustomerSummaryDTO | undefined {
+        return this.customerSummaryDTOS[0];
+    }
 
     closePricesModal() {
 

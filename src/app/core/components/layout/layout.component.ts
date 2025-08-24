@@ -7,16 +7,16 @@ import {LoadingComponent} from "../loading/loading.component";
 import {NotificationAlertComponent} from "../notification/notification-alert.component";
 import {Subscription} from "rxjs";
 import {NgStyle} from "@angular/common";
+import {SideNavComponent} from "../side-nav/side-nav.component";
 
 @Component({
   selector: 'app-layout',
-  imports: [
-    SidebarComponent,
-    RouterOutlet,
-    LoadingComponent,
-    NotificationAlertComponent,
-    NgStyle
-  ],
+    imports: [
+        RouterOutlet,
+        LoadingComponent,
+        NotificationAlertComponent,
+        SideNavComponent
+    ],
   templateUrl: './layout.component.html',
   standalone: true,
   styleUrl: './layout.component.scss'

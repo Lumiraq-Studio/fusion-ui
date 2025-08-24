@@ -43,41 +43,40 @@
                 <table class="w-full">
                     <thead class="mb-6">
                     <tr>
-<!--                        <th class="w-4 p-4">-->
-<!--                            <input type="checkbox" class="checkbox">-->
-<!--                        </th>-->
+                        <!--                        <th class="w-4 p-4">-->
+                        <!--                            <input type="checkbox" class="checkbox">-->
+                        <!--                        </th>-->
                         <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Shop Type</th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Reference</th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Full Name</th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Route</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600 sm:block hidden ">Contact</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600 sm:block hidden ">Contact
+                        </th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Status</th>
                         <th class="w-10 p-4"></th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-primary-50">
-                        @if (customerDataDTOS?.length) {
-                            @for (customer of customerDataDTOS; track customer.id) {
-                                <tr class="hover:bg-primary-50">
-<!--                                    <td class="w-4 p-4">-->
-<!--                                        <input type="checkbox" class="checkbox">-->
-<!--                                    </td>-->
-                                    <td class="px-4 py-2 text-sm whitespace-nowrap">{{ customer.shopType }}</td>
-                                    <td class="px-4 py-2 text-sm whitespace-nowrap">{{ customer.cRef }}</td>
-                                    <td class="px-4 py-2 text-sm">{{ customer.fullName | titlecase }}
-                                    <td class="px-4 py-2 text-sm">{{ customer.routeName | titlecase }}</td>
-                                    <td class="px-4 py-2 text-sm sm:block hidden">{{ customer.contact || '-' }}</td>
-                                    <td class="px-4 py-3">
-                                        <app-status-badge [status]="customer.status"></app-status-badge>
-                                    </td>
-                                    <td class="p-2">
-                                        <button class="p-1 hover:bg-primary-100 rounded"
-                                                (click)="(this.$$CreateModal.set(true)); handleClick(customer.id||0)">
-                                            <fa-icon [icon]="faEllipsisV"></fa-icon>
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
+                        @for (customer of customerDataDTOS; track customer.id) {
+                            <tr class="hover:bg-primary-50">
+                                <!--                                    <td class="w-4 p-4">-->
+                                <!--                                        <input type="checkbox" class="checkbox">-->
+                                <!--                                    </td>-->
+                                <td class="px-4 py-2 text-sm whitespace-nowrap">{{ customer.shopType }}</td>
+                                <td class="px-4 py-2 text-sm whitespace-nowrap">{{ customer.cRef }}</td>
+                                <td class="px-4 py-2 text-sm">{{ customer.fullName | titlecase }}
+                                <td class="px-4 py-2 text-sm">{{ customer.routeName | titlecase }}</td>
+                                <td class="px-4 py-2 text-sm sm:block hidden">{{ customer.contact || '-' }}</td>
+                                <td class="px-4 py-3">
+                                    <app-status-badge [status]="customer.status"></app-status-badge>
+                                </td>
+                                <td class="p-2">
+                                    <button class="p-1 hover:bg-primary-100 rounded"
+                                            (click)="(this.$$CreateModal.set(true)); handleClick(customer.id||0)">
+                                        <fa-icon [icon]="faEllipsisV"></fa-icon>
+                                    </button>
+                                </td>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -94,11 +93,11 @@
                 <h2 class="text-sm font-medium mb-4">CUSTOMER OVERVIEW</h2>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <div class="text-2xl font-semibold">{{ customerSummaryDTOS[0]?.totalShops}}</div>
+                        <div class="text-2xl font-semibold">{{ customerSummary?.totalShops }}</div>
                         <div class="text-sm text-primary-400">Total Customers</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-semibold">{{ customerSummaryDTOS[0]?.newThisMonth}}</div>
+                        <div class="text-2xl font-semibold">{{ customerSummary?.newThisMonth }}</div>
                         <div class="text-sm text-primary-400">New This Month</div>
                     </div>
                 </div>
@@ -115,16 +114,15 @@
                             <div class="w-2 h-2 rounded-full bg-green-500"></div>
                             <span class="text-sm">Active</span>
                         </div>
-                        <span class="text-sm">{{ customerSummaryDTOS[0]?.activePercentage}}%</span>
+                        <span class="text-sm">{{ customerSummary?.activePercentage }}%</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             <div class="w-2 h-2 rounded-full bg-orange-500"></div>
                             <span class="text-sm">Inactive</span>
                         </div>
-                        <span class="text-sm">{{ customerSummaryDTOS[0]?.inactivePercentage}}%</span>
+                        <span class="text-sm">{{ customerSummary?.inactivePercentage }}%</span>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -341,7 +339,7 @@
                             <tbody>
                                 @for (productGroup of variantResultDTOS; track productGroup.name) {
                                     <tr class="border-b border-primary-50 hover:bg-primary-25">
-                                        <td class="px-4 py-2 text-sm font-medium">{{productGroup.name}}</td>
+                                        <td class="px-4 py-2 text-sm font-medium">{{ productGroup.name }}</td>
                                         @for (variant of productGroup.variants; track variant.unit) {
                                             <td class="px-4 py-2 text-sm text-center">
                                                 <input

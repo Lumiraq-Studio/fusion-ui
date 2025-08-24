@@ -77,31 +77,31 @@
     <!-- Right summary panel -->
     <div class="w-80 border-l border-primary-100 p-6 bg-white min-h-screen">
         <div class="space-y-6 divide-y divide-primary-100">
-
+            <!-- Sales Team Overview Section -->
             <div class="pb-6">
                 <h2 class="text-sm font-medium mb-4">SALES TEAM OVERVIEW</h2>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <div class="text-2xl font-semibold">{{ salesTeamSummaryDTOS[0]?.totalSalesPeople }}</div>
+                        <div class="text-2xl font-semibold">{{ salesTeamSummary?.totalSalesPeople }}</div>
                         <div class="text-sm text-primary-400">Total Sales People</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-semibold">{{ salesTeamSummaryDTOS[0]?.activeMembers }}</div>
+                        <div class="text-2xl font-semibold">{{ salesTeamSummary?.activeMembers }}</div>
                         <div class="text-sm text-primary-400">Active Members</div>
                     </div>
                 </div>
             </div>
 
+            <!-- Performance Metrics Section -->
             <div class="py-6">
                 <h2 class="text-sm font-medium mb-4">PERFORMANCE METRICS</h2>
-                <div class="grid  gap-4">
+                <div class="grid gap-4">
                     <div>
-                        <div class="text-2xl font-semibold">Rs. {{ salesTeamSummaryDTOS[0]?.avgMonthlySales }}</div>
+                        <div class="text-2xl font-semibold">Rs. {{ salesTeamSummary?.avgMonthlySales }}</div>
                         <div class="text-sm text-primary-400">Monthly Sales</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-semibold">{{ salesTeamSummaryDTOS[0]?.targetAchievementPercentage }}%
-                        </div>
+                        <div class="text-2xl font-semibold">{{ salesTeamSummary?.targetAchievementPercentage }}%</div>
                         <div class="text-sm text-primary-400">Avg. Target</div>
                     </div>
                 </div>
@@ -141,7 +141,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                    @for (product of SalesRepStock[0]?.availableStock; track product.productId) {
+                                    @for (product of salesRepStock?.availableStock; track product.productId) {
                                         @for (variant of product.variants; track variant.variantId) {
                                             <tr class="hover:bg-gray-50 border-b last:border-b-0 transition-colors">
                                                 <td class="px-4 py-3">{{ product.productName }}</td>
@@ -252,7 +252,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                        @for (product of SalesRepStock[0]?.availableStock; track product.productId) {
+                                        @for (product of salesRepStock?.availableStock; track product.productId) {
                                             @for (variant of product.variants; track variant.variantId) {
                                                 <tr class="hover:bg-gray-50 border-b last:border-b-0 transition-colors">
                                                     <td class="px-4 py-3">{{ product.productName }}</td>
