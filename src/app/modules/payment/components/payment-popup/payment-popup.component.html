@@ -1,0 +1,234 @@
+<div *ngIf="isOpen" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <!-- Modal Container -->
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+        <!-- Header -->
+        <div class="flex justify-between items-center p-6 border-b border-primary-100">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center"
+                     [class.bg-green-100]="mode === 'cash_in'"
+                     [class.bg-orange-100]="mode === 'cash_out'">
+                    <fa-icon [icon]="mode === 'cash_in' ? faArrowDown : faArrowUp"
+                             [class.text-green-600]="mode === 'cash_in'"
+                             [class.text-orange-600]="mode === 'cash_out'"></fa-icon>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold">
+                        {{ mode === 'cash_in' ? 'Cash In' : 'Cash Out' }} Transaction
+                    </h2>
+                    <p class="text-sm text-primary-400">
+                        {{ mode === 'cash_in' ? 'Record money coming into business' : 'Record money going out of business' }}
+                    </p>
+                </div>
+            </div>
+            <button (click)="closePopup()" class="p-2 hover:bg-primary-100 rounded-lg">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+
+        <!-- Form Content -->
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+            <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+                <!-- Transaction Type Toggle -->
+                <div class="mb-6">
+                    <div class="flex rounded-lg border border-primary-200 p-1">
+                        <button type="button"
+                                (click)="setMode('cash_in')"
+                                class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition-colors"
+                                [class.bg-green-100]="mode === 'cash_in'"
+                                [class.text-green-700]="mode === 'cash_in'"
+                                [class.text-primary-500]="mode !== 'cash_in'">
+                            <fa-icon [icon]="faArrowDown"></fa-icon>
+                            Cash In
+                        </button>
+                        <button type="button"
+                                (click)="setMode('cash_out')"
+                                class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md transition-colors"
+                                [class.bg-orange-100]="mode === 'cash_out'"
+                                [class.text-orange-700]="mode === 'cash_out'"
+                                [class.text-primary-500]="mode !== 'cash_out'">
+                            <fa-icon [icon]="faArrowUp"></fa-icon>
+                            Cash Out
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Amount -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-primary-700 mb-2">
+                        Amount <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-500">රු</span>
+                        <input type="number"
+                               formControlName="amount"
+                               class="form-input pl-10"
+                               placeholder="0.00"
+                               min="0"
+                               step="0.01">
+                    </div>
+                    <div *ngIf="paymentForm.get('amount')?.errors?.['required'] && paymentForm.get('amount')?.touched"
+                         class="text-red-500 text-xs mt-1">
+                        Amount is required
+                    </div>
+                </div>
+
+                <!-- Category and Subcategory -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-primary-700 mb-2">
+                            Category <span class="text-red-500">*</span>
+                        </label>
+                        <select formControlName="categoryId" class="form-input" (change)="onCategoryChange()">
+                            <option value="">Select Category</option>
+                            <option *ngFor="let category of getFilteredCategories()" [value]="category.id">
+                                {{ category.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-primary-700 mb-2">
+                            Subcategory <span class="text-red-500">*</span>
+                        </label>
+                        <select formControlName="subcategoryId" class="form-input" [disabled]="!selectedCategory">
+                            <option value="">Select Subcategory</option>
+                            <option *ngFor="let subcategory of selectedCategory?.subcategories" [value]="subcategory.id">
+                                {{ subcategory.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-primary-700 mb-2">
+                        Payment Method <span class="text-red-500">*</span>
+                    </label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <label class="flex items-center justify-center p-3 border rounded-lg cursor-pointer hover:bg-primary-50"
+                               [class.border-primary-300]="paymentForm.get('paymentMethod')?.value === 'cash'"
+                               [class.bg-primary-50]="paymentForm.get('paymentMethod')?.value === 'cash'">
+                            <input type="radio" formControlName="paymentMethod" value="cash" class="sr-only">
+                            <div class="text-center">
+                                <fa-icon [icon]="faWallet" class="text-green-600 mb-1"></fa-icon>
+                                <div class="text-xs">Cash</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center justify-center p-3 border rounded-lg cursor-pointer hover:bg-primary-50"
+                               [class.border-primary-300]="paymentForm.get('paymentMethod')?.value === 'cheque'"
+                               [class.bg-primary-50]="paymentForm.get('paymentMethod')?.value === 'cheque'">
+                            <input type="radio" formControlName="paymentMethod" value="cheque" class="sr-only">
+                            <div class="text-center">
+                                <fa-icon [icon]="faReceipt" class="text-blue-600 mb-1"></fa-icon>
+                                <div class="text-xs">Cheque</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center justify-center p-3 border rounded-lg cursor-pointer hover:bg-primary-50"
+                               [class.border-primary-300]="paymentForm.get('paymentMethod')?.value === 'bank_transfer'"
+                               [class.bg-primary-50]="paymentForm.get('paymentMethod')?.value === 'bank_transfer'">
+                            <input type="radio" formControlName="paymentMethod" value="bank_transfer" class="sr-only">
+                            <div class="text-center">
+                                <fa-icon [icon]="faCreditCard" class="text-purple-600 mb-1"></fa-icon>
+                                <div class="text-xs">Transfer</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center justify-center p-3 border rounded-lg cursor-pointer hover:bg-primary-50"
+                               [class.border-primary-300]="paymentForm.get('paymentMethod')?.value === 'card'"
+                               [class.bg-primary-50]="paymentForm.get('paymentMethod')?.value === 'card'">
+                            <input type="radio" formControlName="paymentMethod" value="card" class="sr-only">
+                            <div class="text-center">
+                                <fa-icon [icon]="faMoneyBill" class="text-orange-600 mb-1"></fa-icon>
+                                <div class="text-xs">Card</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Cheque Details (if cheque selected) -->
+                <div *ngIf="paymentForm.get('paymentMethod')?.value === 'cheque'" class="mb-6 p-4 bg-blue-50 rounded-lg">
+                    <h4 class="text-sm font-medium text-blue-800 mb-3">Cheque Details</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-blue-700 mb-1">Cheque Number</label>
+                            <input type="text"
+                                   formControlName="chequeNumber"
+                                   class="form-input text-sm"
+                                   placeholder="123456">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-blue-700 mb-1">Bank Name</label>
+                            <input type="text"
+                                   formControlName="bankName"
+                                   class="form-input text-sm"
+                                   placeholder="Bank of Ceylon">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-blue-700 mb-1">Cheque Date</label>
+                            <input type="date"
+                                   formControlName="chequeDate"
+                                   class="form-input text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reference/Description -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-primary-700 mb-2">
+                        Description
+                    </label>
+                    <textarea formControlName="description"
+                              class="form-input"
+                              rows="3"
+                              placeholder="Add description or notes..."></textarea>
+                </div>
+
+                <!-- Reference Number (optional) -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-primary-700 mb-2">
+                        Reference Number
+                    </label>
+                    <input type="text"
+                           formControlName="reference"
+                           class="form-input"
+                           placeholder="REF-001 (optional)">
+                </div>
+
+                <!-- Date -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-primary-700 mb-2">
+                        Transaction Date <span class="text-red-500">*</span>
+                    </label>
+                    <input type="datetime-local"
+                           formControlName="date"
+                           class="form-input">
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-between items-center p-6 border-t border-primary-100 bg-primary-25">
+            <button type="button"
+                    (click)="closePopup()"
+                    class="px-4 py-2 text-primary-600 hover:bg-primary-100 rounded-lg">
+                Cancel
+            </button>
+            <div class="flex gap-3">
+                <button type="button"
+                        (click)="saveDraft()"
+                        class="px-4 py-2 bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200">
+                    Save Draft
+                </button>
+                <button type="button"
+                        (click)="onSubmit()"
+                        [disabled]="paymentForm.invalid"
+                        class="px-6 py-2 rounded-lg text-white flex items-center gap-2 disabled:opacity-50"
+                        [class.bg-green-600]="mode === 'cash_in'"
+                        [class.hover:bg-green-700]="mode === 'cash_in'"
+                        [class.bg-orange-600]="mode === 'cash_out'"
+                        [class.hover:bg-orange-700]="mode === 'cash_out'">
+                    <fa-icon [icon]="faCheck"></fa-icon>
+                    Record Transaction
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
