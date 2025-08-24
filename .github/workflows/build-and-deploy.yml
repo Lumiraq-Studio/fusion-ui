@@ -17,7 +17,7 @@ jobs:
   # 🔹 Job 1: Build only on PR
   build-on-pr:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       NODE_ENV: development
     steps:
@@ -34,10 +34,10 @@ jobs:
             CONFIGURATION=development
           tags: temp-${{ env.APP_NAME }}:test
 
-  # 🔹 Job 2: Build + Push on merge
+  # 🔹 Job 2: Build + Push + Deploy on merge
   build-and-push:
     if: github.event_name == 'push'
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
@@ -49,14 +49,18 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Set IMAGE_REPO and CONFIGURATION
+      - name: Set IMAGE_REPO, CONFIGURATION, and CONTAINER_NAME
         run: |
           if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
             echo "IMAGE_REPO=lumiraqdev/fusion-ui-prod" >> $GITHUB_ENV
             echo "CONFIGURATION=production" >> $GITHUB_ENV
+            echo "CONTAINER_NAME=fusion-ui-prod" >> $GITHUB_ENV
+            echo "PORT=80" >> $GITHUB_ENV
           else
             echo "IMAGE_REPO=lumiraqdev/fusion-ui-dev" >> $GITHUB_ENV
             echo "CONFIGURATION=development" >> $GITHUB_ENV
+            echo "CONTAINER_NAME=fusion-ui-dev" >> $GITHUB_ENV
+            echo "PORT=8080" >> $GITHUB_ENV
           fi
         shell: bash
 
@@ -68,3 +72,9 @@ jobs:
           build-args: |
             CONFIGURATION=${{ env.CONFIGURATION }}
           tags: ${{ env.IMAGE_REPO }}:latest
+
+      - name: Deploy Docker container locally
+        run: |
+          docker stop ${{ env.CONTAINER_NAME }} || true
+          docker rm ${{ env.CONTAINER_NAME }} || true
+          docker run -d --name ${{ env.CONTAINER_NAME }} -p ${{ env.PORT }}:80 ${{ env.IMAGE_REPO }}:latest
