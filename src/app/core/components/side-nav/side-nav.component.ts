@@ -11,9 +11,10 @@ import {
     faMapLocationDot,
     faPeopleGroup,
     faPeopleRoof,
-    faCreditCard,
+    faCreditCard, faSignOut,
 } from '@fortawesome/free-solid-svg-icons';
 import { SettingsStorageService } from "../../services/settings-storage.service";
+import {AuthenticationService} from "../../modules/authentication/service/authentication.service";
 
 @Component({
     selector: 'app-side-nav',
@@ -30,6 +31,7 @@ import { SettingsStorageService } from "../../services/settings-storage.service"
 export class SideNavComponent implements OnInit {
 
     private settingsStorage = inject(SettingsStorageService);
+    private authService = inject(AuthenticationService);
 
     isLocked = signal(false);
     showSettings = signal(false);
@@ -108,6 +110,15 @@ export class SideNavComponent implements OnInit {
         enabled: true
     });
 
+    userName = signal('');
+
+    constructor() {
+      const user=  this.authService.getUserInfo();
+        if (user){
+            this.userName.set(user.userName)
+        }
+    }
+
     async ngOnInit() {
         try {
             const savedSettings = await this.settingsStorage.loadSettings();
@@ -139,4 +150,10 @@ export class SideNavComponent implements OnInit {
     clearCache(): void {
         // Implement your cache clearing logic here
     }
+
+    logout() {
+        this.authService.logout();
+    }
+
+    protected readonly faSignOut = faSignOut;
 }
