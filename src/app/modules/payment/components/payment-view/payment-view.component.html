@@ -16,6 +16,7 @@
         </div>
 
         <!-- Cash Balance Cards -->
+        @if (cashSummaryDTOS && cashSummaryDTOS.length > 0) {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div class="bg-white rounded-lg border border-primary-100 p-4">
                 <div class="flex justify-between items-center">
@@ -53,6 +54,7 @@
                 </div>
             </div>
         </div>
+        }
 
         <!-- Transaction List Section -->
         <div class="bg-white rounded-lg border border-primary-100 p-4">
