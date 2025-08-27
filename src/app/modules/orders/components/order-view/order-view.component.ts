@@ -11,6 +11,7 @@ import {TitleCasePipe} from "@angular/common";
 import {StatusBadgeComponent} from "../../../shared";
 import {OrderSummeryPanelComponent} from "../order-summery-panel/order-summery-panel.component";
 import {OrderViewModalComponent} from "../order-view-modal/order-view-modal.component";
+import {RouteService} from "../../../routes/services/routes.service";
 
 @Component({
     selector: 'app-order-view',
@@ -40,6 +41,7 @@ export class OrderViewComponent {
     notification = inject(NotificationService);
     loading = inject(LoadingService);
     salesPersonService = inject(SalesPersonService);
+    routeService = inject(RouteService)
     GetOrderDTOS: GetOrderDTO[] = []
 
     $$orderCreate = signal(false);
@@ -75,6 +77,11 @@ export class OrderViewComponent {
 
     searchOrder() {
         this.fetchOrders()
+    }
+
+    onRouteChange(event: any) {
+        this.searchParams.route_id = Number(event.target.value);
+        // this.routeId = Number(event.target.value);
     }
 
     fetchOrders() {

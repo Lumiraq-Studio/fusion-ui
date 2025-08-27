@@ -5,7 +5,6 @@ import {BehaviorSubject, finalize, tap} from "rxjs";
 import {toSignal} from "@angular/core/rxjs-interop";
 import {APIRequestResources, CachedAPIRequest, LoadingService, PaginationResponse} from "../../../core";
 import {CustomerCreateDTO, CustomerFindDTO} from "../interfaces/customers.entity";
-import {take} from "rxjs/operators";
 
 
 @Injectable({

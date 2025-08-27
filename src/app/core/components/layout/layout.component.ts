@@ -1,12 +1,10 @@
 import {ChangeDetectorRef, Component, computed, OnDestroy} from '@angular/core';
 import {LoadingService} from "../../services/loading.service";
 import {NotificationService} from "../../services";
-import {SidebarComponent} from "../sidebar/sidebar.component";
 import {RouterOutlet} from "@angular/router";
 import {LoadingComponent} from "../loading/loading.component";
 import {NotificationAlertComponent} from "../notification/notification-alert.component";
 import {Subscription} from "rxjs";
-import {NgStyle} from "@angular/common";
 import {SideNavComponent} from "../side-nav/side-nav.component";
 
 @Component({
