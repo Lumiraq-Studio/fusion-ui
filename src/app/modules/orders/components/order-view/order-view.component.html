@@ -23,6 +23,15 @@
             </div>
 
             <div class="relative">
+                <select class="form-select w-full" (change)="onRouteChange($event)">
+                    <option value="" disabled hidden selected>Select a Route</option>
+                    @for (route of routeService.all(); track route.id) {
+                        <option [value]="route.id">{{ route.name }}</option>
+                    }
+                </select>
+            </div>
+
+            <div class="relative">
                 <input type="date" [(ngModel)]="searchParams.order_date" placeholder="Order Date"
                        class="form-input">
             </div>
