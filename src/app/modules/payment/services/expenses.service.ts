@@ -8,7 +8,7 @@ import {APIRequestResources, CachedAPIRequest, LoadingService, PaginationRespons
 import {PriceDTO} from "../../reports/interfaces/report.entity";
 import {SalesSummaryDTO} from "../../dashboard/interface/sales-summary.entity";
 import {FindOrderDTO, GetOrderDTO} from "../../orders/interfaces/order.entity";
-import {SalesRepExpenseDTO} from "../interfaces/expenses.entity";
+import {CashSummaryDTO, SalesRepExpenseDTO} from "../interfaces/expenses.entity";
 
 
 @Injectable({
@@ -19,7 +19,7 @@ export class ExpensesService extends CachedAPIRequest {
     $all = new BehaviorSubject<SalesRepExpenseDTO[]>([]);
     all = toSignal(this.$all, {initialValue: []});
 
-    $summary = new BehaviorSubject<SalesSummaryDTO[]>([]);
+    $summary = new BehaviorSubject<CashSummaryDTO[]>([]);
     summary = toSignal(this.$summary, {initialValue: []});
 
     $active = new BehaviorSubject<GetOrderDTO | undefined>(undefined);
@@ -75,12 +75,12 @@ export class ExpensesService extends CachedAPIRequest {
         this.$active.next(undefined)
     }
 
-    salesSummary = (dateValue: any, refresh = true) => {
-        return this.get<SalesSummaryDTO[]>({
-            endpoint: `summary/${dateValue}`
+    salesSummary = (refresh = true) => {
+        return this.get<CashSummaryDTO>({
+            endpoint: `summary`
         }, refresh ? 'freshness' : 'performance')
             .pipe(
-                tap((res) => this.$summary.next(res.data)),
+
             )
     }
 

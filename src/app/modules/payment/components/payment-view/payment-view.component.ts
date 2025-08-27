@@ -9,7 +9,7 @@ import {FormsModule} from "@angular/forms";
 import {PaymentRecord} from "../../interfaces/payment-record.entity";
 import {SalesPersonService} from "../../../sales-persons/services/sales-person.service";
 import {ExpensesService} from "../../services/expenses.service";
-import {SalesRepExpenseDTO} from "../../interfaces/expenses.entity";
+import {CashSummaryDTO, SalesRepExpenseDTO} from "../../interfaces/expenses.entity";
 
 @Component({
     selector: 'app-payment-view',
@@ -57,6 +57,7 @@ export class PaymentViewComponent {
 
 
     salesRepExpenseDTOS: SalesRepExpenseDTO[] = []
+    cashSummaryDTOS: CashSummaryDTO[] = []
     // Data
     transactions: PaymentRecord[] = [
         {
@@ -83,6 +84,7 @@ export class PaymentViewComponent {
 
     constructor() {
         this.applyFilters();
+        this.getSummary()
     }
 
     get currentBalance(): number {
@@ -168,5 +170,16 @@ export class PaymentViewComponent {
         this.paginatedTransactions = this.filteredTransactions.slice(startIndex, endIndex);
     }
 
+    getSummary(){
+        this.expensesService.salesSummary(true).subscribe({
+            next: (response) => {
+              this.cashSummaryDTOS=[response.data]
+                console.log(this.cashSummaryDTOS)
+            },
+            error: (error) => {
+                console.error(error);
+            }
+        })
+    }
 
 }

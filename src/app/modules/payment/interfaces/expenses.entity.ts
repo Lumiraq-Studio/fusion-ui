@@ -6,3 +6,10 @@ export interface SalesRepExpenseDTO {
     totalExpenseAmount: number;
     totalAssignedAmount: number;
 }
+
+export interface CashSummaryDTO{
+    todayCashOut: string;
+    cashInHand: string;
+    totalSales: string;
+    cashOnHand: string;
+}
