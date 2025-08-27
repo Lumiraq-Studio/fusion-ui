@@ -59,28 +59,18 @@
             <!-- Transaction Filters -->
             <div class="flex gap-3 mb-6">
                 <div class="relative">
-                    <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-                        <fa-icon [icon]="faSearch" class="text-primary-200"></fa-icon>
-                    </div>
-                    <input type="text"
+                    <input type="date"
                            placeholder="Search transactions"
                            class="ps-10 form-input"
-                           [(ngModel)]="searchTerm"
-                           (input)="onSearch()">
+                           [(ngModel)]="searchParams.expensesDate">
                 </div>
-                <div class="relative">
-                    <select class="form-input" [(ngModel)]="filterType" (change)="applyFilters()">
-                        <option value="all">All Types</option>
-                        <option value="cash_in">Cash In</option>
-                        <option value="cash_out">Cash Out</option>
-                    </select>
-                </div>
-                <div class="relative">
-                    <select class="form-input" [(ngModel)]="filterPeriod" (change)="applyFilters()">
-                        <option value="today">Today</option>
-                        <option value="week">This Week</option>
-                        <option value="month">This Month</option>
-                        <option value="all">All Time</option>
+                <div class="relative mb-6">
+                    <select class="form-input" [(ngModel)]="searchParams.salesRepId">
+                        <option value="" hidden selected disabled>Select Sales Person</option>
+                        <option value="">All Persons</option>
+                        @for (person of salesPersonService.all(); track person) {
+                            <option [value]="person.id">{{ person.name }}</option>
+                        }
                     </select>
                 </div>
                 <div class="relative">
@@ -96,68 +86,26 @@
                 <table class="w-full">
                     <thead>
                     <tr>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Date & Time</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Transaction ID</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Type</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Category</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Payment Method</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Description</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Amount</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Balance</th>
-                        <th class="w-10 p-4"></th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Reference</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Date</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Sales Rep</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Assigned Amount</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Expensed Amount</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Balanced</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-primary-100">
-                    <tr *ngFor="let transaction of paginatedTransactions" class="hover:bg-primary-50">
-                        <td class="px-4 py-3 text-sm">{{ transaction.date | date:'yyyy-MM-dd HH:mm' }}</td>
-                        <td class="px-4 py-3 text-sm">{{ transaction.reference || generateTxnId(transaction) }}</td>
-                        <td class="px-4 py-3">
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                          [class.bg-green-100]="transaction.type === 'cash_in'"
-                          [class.text-green-700]="transaction.type === 'cash_in'"
-                          [class.bg-orange-100]="transaction.type === 'cash_out'"
-                          [class.text-orange-700]="transaction.type === 'cash_out'">
-                      <fa-icon [icon]="transaction.type === 'cash_in' ? faArrowDown : faArrowUp" class="mr-1"></fa-icon>
-                        {{ transaction.type === 'cash_in' ? 'Cash In' : 'Cash Out' }}
-                    </span>
-                        </td>
-                        <td class="px-4 py-3 text-sm">{{ getCategoryName(transaction.categoryId) }}</td>
-                        <td class="px-4 py-3 text-sm">{{ formatPaymentMethod(transaction.paymentMethod) }}</td>
-                        <td class="px-4 py-3 text-sm">{{ transaction.description || '-' }}</td>
-                        <td class="px-4 py-3 text-sm font-medium"
-                            [class.text-green-600]="transaction.type === 'cash_in'"
-                            [class.text-orange-600]="transaction.type === 'cash_out'">
-                            {{ transaction.type === 'cash_in' ? '+' : '-' }}
-                            රු {{ transaction.amount | number:'1.2-2' }}
-                        </td>
+                    <tr *ngFor="let transaction of salesRepExpenseDTOS let i = index" class="hover:bg-primary-50">
                         <td class="px-4 py-3 text-sm">
-                            රු {{ calculateRunningBalance(transaction) | number:'1.2-2' }}
+                            {{ generateReference(transaction.expenseDay, i + 1) }}
                         </td>
-                        <td class="p-4">
-                            <div class="relative">
-                                <button class="p-1 hover:bg-primary-100 rounded"
-                                        (click)="toggleDropdown(transaction.id)">
-                                    <fa-icon [icon]="faEllipsisV"></fa-icon>
-                                </button>
-                                <div *ngIf="dropdownOpen === transaction.id"
-                                     class="absolute right-0 top-8 bg-white border border-primary-200 rounded-lg shadow-lg z-10 min-w-32">
-                                    <button class="w-full px-3 py-2 text-left text-sm hover:bg-primary-50 rounded-t-lg"
-                                            (click)="editTransaction(transaction)">
-                                        Edit
-                                    </button>
-                                    <button class="w-full px-3 py-2 text-left text-sm hover:bg-primary-50"
-                                            (click)="viewTransaction(transaction)">
-                                        View Details
-                                    </button>
-                                    <button class="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 rounded-b-lg"
-                                            (click)="deleteTransaction(transaction)">
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
+                        <td class="px-4 py-3 text-sm">{{ transaction.expenseDay | date:'yyyy-MM-dd' }}</td>
+                        <td class="px-4 py-3 text-sm">{{ transaction.salesRepName || '-' }}</td>
+                        <td class="px-4 py-3 text-sm">රු {{ transaction.totalAssignedAmount }}</td>
+                        <td class="px-4 py-3 text-sm">රු {{ transaction.totalExpenseAmount }}</td>
+                        <td class="px-4 py-3 text-sm">රු {{ transaction.balance }}</td>
                     </tr>
-                    <tr *ngIf="paginatedTransactions.length === 0">
+                    <tr *ngIf="salesRepExpenseDTOS.length==0">
                         <td colspan="9" class="px-4 py-8 text-center text-primary-400">
                             No transactions found
                         </td>
@@ -175,77 +123,77 @@
     </div>
 
     <!-- Right summary panel -->
-    <div class="w-80 border-l border-primary-100 p-6 bg-white min-h-screen">
-        <div class="space-y-6 divide-y divide-primary-100">
-            <div class="pb-6">
-                <h2 class="text-sm font-medium mb-4">TRANSACTION SUMMARY</h2>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <div class="text-sm text-primary-400">Total Transactions</div>
-                        <div class="text-sm font-semibold">{{ transactions.length }}</div>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <div class="text-sm text-primary-400">Average Transaction</div>
-                        <div class="text-sm font-semibold">රු {{ getAverageTransaction() | number:'1.2-2' }}
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!--    <div class="w-80 border-l border-primary-100 p-6 bg-white min-h-screen">-->
+    <!--        <div class="space-y-6 divide-y divide-primary-100">-->
+    <!--            <div class="pb-6">-->
+    <!--                <h2 class="text-sm font-medium mb-4">TRANSACTION SUMMARY</h2>-->
+    <!--                <div class="space-y-4">-->
+    <!--                    <div class="flex justify-between items-center">-->
+    <!--                        <div class="text-sm text-primary-400">Total Transactions</div>-->
+    <!--                        <div class="text-sm font-semibold">{{ transactions.length }}</div>-->
+    <!--                    </div>-->
+    <!--                    <div class="flex justify-between items-center">-->
+    <!--                        <div class="text-sm text-primary-400">Average Transaction</div>-->
+    <!--                        <div class="text-sm font-semibold">රු {{ getAverageTransaction() | number:'1.2-2' }}-->
+    <!--                        </div>-->
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--            </div>-->
 
-            <div class="py-6">
-                <h2 class="text-sm font-medium mb-4">RECENT ACTIVITIES</h2>
-                <div class="space-y-4">
-                    <div *ngFor="let activity of getRecentActivities()" class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                             [class.bg-green-100]="activity.type === 'cash_in'"
-                             [class.bg-orange-100]="activity.type === 'cash_out'">
-                            <fa-icon [icon]="activity.type === 'cash_in' ? faArrowDown : faArrowUp"
-                                     [class.text-green-600]="activity.type === 'cash_in'"
-                                     [class.text-orange-600]="activity.type === 'cash_out'"></fa-icon>
-                        </div>
-                        <div>
-                            <div class="text-sm font-medium">
-                                {{ activity.type === 'cash_in' ? 'Cash In' : 'Cash Out' }} -
-                                {{ activity.reference || generateTxnId(activity) }}
-                            </div>
-                            <div class="text-xs text-primary-400">{{ getTimeAgo(activity.date) }}</div>
-                        </div>
-                        <div class="text-sm font-medium ml-auto"
-                             [class.text-green-600]="activity.type === 'cash_in'"
-                             [class.text-orange-600]="activity.type === 'cash_out'">
-                            {{ activity.type === 'cash_in' ? '+' : '-' }}
-                            රු {{ activity.amount | number:'1.2-2' }}
-                        </div>
-                    </div>
-                    <div *ngIf="getRecentActivities().length === 0" class="text-sm text-primary-400">
-                        No recent activities
-                    </div>
-                </div>
-            </div>
+    <!--            <div class="py-6">-->
+    <!--                <h2 class="text-sm font-medium mb-4">RECENT ACTIVITIES</h2>-->
+    <!--                <div class="space-y-4">-->
+    <!--                    <div *ngFor="let activity of getRecentActivities()" class="flex items-start gap-3">-->
+    <!--                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"-->
+    <!--                             [class.bg-green-100]="activity.type === 'cash_in'"-->
+    <!--                             [class.bg-orange-100]="activity.type === 'cash_out'">-->
+    <!--                            <fa-icon [icon]="activity.type === 'cash_in' ? faArrowDown : faArrowUp"-->
+    <!--                                     [class.text-green-600]="activity.type === 'cash_in'"-->
+    <!--                                     [class.text-orange-600]="activity.type === 'cash_out'"></fa-icon>-->
+    <!--                        </div>-->
+    <!--                        <div>-->
+    <!--                            <div class="text-sm font-medium">-->
+    <!--                                {{ activity.type === 'cash_in' ? 'Cash In' : 'Cash Out' }} - -->
+    <!--                                {{ activity.reference || generateTxnId(activity) }}-->
+    <!--                            </div>-->
+    <!--                            <div class="text-xs text-primary-400">{{ getTimeAgo(activity.date) }}</div>-->
+    <!--                        </div>-->
+    <!--                        <div class="text-sm font-medium ml-auto"-->
+    <!--                             [class.text-green-600]="activity.type === 'cash_in'"-->
+    <!--                             [class.text-orange-600]="activity.type === 'cash_out'">-->
+    <!--                            {{ activity.type === 'cash_in' ? '+' : '-' }}-->
+    <!--                            රු {{ activity.amount | number:'1.2-2' }}-->
+    <!--                        </div>-->
+    <!--                    </div>-->
+    <!--                    <div *ngIf="getRecentActivities().length === 0" class="text-sm text-primary-400">-->
+    <!--                        No recent activities-->
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--            </div>-->
 
-            <div class="pt-6">
-                <h2 class="text-sm font-medium mb-4">CASH FLOW ANALYSIS</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <div class="text-2xl font-semibold text-green-600">{{ getCashInPercentage() }}%</div>
-                        <div class="text-sm text-primary-400">Cash In Rate</div>
-                    </div>
-                    <div>
-                        <div class="text-2xl font-semibold text-orange-600">{{ getCashOutPercentage() }}%</div>
-                        <div class="text-sm text-primary-400">Cash Out Rate</div>
-                    </div>
-                    <div>
-                        <div class="text-2xl font-semibold">රු {{ getWeeklyAverage() | number:'1.0-0' }}k</div>
-                        <div class="text-sm text-primary-400">Weekly Avg</div>
-                    </div>
-                    <div>
-                        <div class="text-2xl font-semibold">{{ getDailyTransactions() }}</div>
-                        <div class="text-sm text-primary-400">Daily Txns</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!--            <div class="pt-6">-->
+    <!--                <h2 class="text-sm font-medium mb-4">CASH FLOW ANALYSIS</h2>-->
+    <!--                <div class="grid grid-cols-2 gap-4">-->
+    <!--                    <div>-->
+    <!--                        <div class="text-2xl font-semibold text-green-600">{{ getCashInPercentage() }}%</div>-->
+    <!--                        <div class="text-sm text-primary-400">Cash In Rate</div>-->
+    <!--                    </div>-->
+    <!--                    <div>-->
+    <!--                        <div class="text-2xl font-semibold text-orange-600">{{ getCashOutPercentage() }}%</div>-->
+    <!--                        <div class="text-sm text-primary-400">Cash Out Rate</div>-->
+    <!--                    </div>-->
+    <!--                    <div>-->
+    <!--                        <div class="text-2xl font-semibold">රු {{ getWeeklyAverage() | number:'1.0-0' }}k</div>-->
+    <!--                        <div class="text-sm text-primary-400">Weekly Avg</div>-->
+    <!--                    </div>-->
+    <!--                    <div>-->
+    <!--                        <div class="text-2xl font-semibold">{{ getDailyTransactions() }}</div>-->
+    <!--                        <div class="text-sm text-primary-400">Daily Txns</div>-->
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
 </div>
 
 <!-- Payment Popup -->
@@ -256,79 +204,79 @@
 >
 </app-payment-popup>
 
-<!-- Transaction Details Modal -->
-<div *ngIf="viewingTransaction"
-     class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
-        <div class="flex justify-between items-center p-6 border-b border-primary-100">
-            <h3 class="text-lg font-semibold">Transaction Details</h3>
-            <button (click)="closeTransactionDetails()" class="p-2 hover:bg-primary-100 rounded-lg">
-<!--                <fa-icon [icon]="faTimes"></fa-icon>-->
-            </button>
-        </div>
-        <div class="p-6">
-            <div class="space-y-4">
-                <div class="flex justify-between">
-                    <span class="text-sm text-primary-600">Transaction ID:</span>
-                    <span class="text-sm font-medium">{{ viewingTransaction.reference || generateTxnId(viewingTransaction) }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-sm text-primary-600">Type:</span>
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                          [class.bg-green-100]="viewingTransaction.type === 'cash_in'"
-                          [class.text-green-700]="viewingTransaction.type === 'cash_in'"
-                          [class.bg-orange-100]="viewingTransaction.type === 'cash_out'"
-                          [class.text-orange-700]="viewingTransaction.type === 'cash_out'">
-                {{ viewingTransaction.type === 'cash_in' ? 'Cash In' : 'Cash Out' }}
-              </span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-sm text-primary-600">Amount:</span>
-                    <span class="text-sm font-medium"
-                          [class.text-green-600]="viewingTransaction.type === 'cash_in'"
-                          [class.text-orange-600]="viewingTransaction.type === 'cash_out'">
-                {{ viewingTransaction.type === 'cash_in' ? '+' : '-' }}
-                        රු {{ viewingTransaction.amount | number:'1.2-2' }}
-              </span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-sm text-primary-600">Category:</span>
-                    <span class="text-sm">{{ getCategoryName(viewingTransaction.categoryId) }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-sm text-primary-600">Subcategory:</span>
-                    <span class="text-sm">{{ getSubcategoryName(viewingTransaction.subcategoryId) }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-sm text-primary-600">Payment Method:</span>
-                    <span class="text-sm">{{ formatPaymentMethod(viewingTransaction.paymentMethod) }}</span>
-                </div>
-                <div *ngIf="viewingTransaction.chequeDetails" class="border-t pt-4">
-                    <h4 class="text-sm font-medium mb-2">Cheque Details</h4>
-                    <div class="space-y-2 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-primary-600">Cheque Number:</span>
-                            <span>{{ viewingTransaction.chequeDetails.chequeNumber }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-primary-600">Bank:</span>
-                            <span>{{ viewingTransaction.chequeDetails.bankName }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-primary-600">Date:</span>
-                            <span>{{ viewingTransaction.chequeDetails.chequeDate | date:'yyyy-MM-dd' }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-sm text-primary-600">Date:</span>
-                    <span class="text-sm">{{ viewingTransaction.date | date:'yyyy-MM-dd HH:mm' }}</span>
-                </div>
-                <div *ngIf="viewingTransaction.description" class="border-t pt-4">
-                    <span class="text-sm text-primary-600">Description:</span>
-                    <p class="text-sm mt-1">{{ viewingTransaction.description }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<!--&lt;!&ndash; Transaction Details Modal &ndash;&gt;-->
+<!--<div *ngIf="viewingTransaction"-->
+<!--     class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">-->
+<!--    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg">-->
+<!--        <div class="flex justify-between items-center p-6 border-b border-primary-100">-->
+<!--            <h3 class="text-lg font-semibold">Transaction Details</h3>-->
+<!--            <button (click)="closeTransactionDetails()" class="p-2 hover:bg-primary-100 rounded-lg">-->
+<!--&lt;!&ndash;                <fa-icon [icon]="faTimes"></fa-icon>&ndash;&gt;-->
+<!--            </button>-->
+<!--        </div>-->
+<!--        <div class="p-6">-->
+<!--            <div class="space-y-4">-->
+<!--                <div class="flex justify-between">-->
+<!--                    <span class="text-sm text-primary-600">Transaction ID:</span>-->
+<!--                    <span class="text-sm font-medium">{{ viewingTransaction.reference || generateTxnId(viewingTransaction) }}</span>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between">-->
+<!--                    <span class="text-sm text-primary-600">Type:</span>-->
+<!--                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"-->
+<!--                          [class.bg-green-100]="viewingTransaction.type === 'cash_in'"-->
+<!--                          [class.text-green-700]="viewingTransaction.type === 'cash_in'"-->
+<!--                          [class.bg-orange-100]="viewingTransaction.type === 'cash_out'"-->
+<!--                          [class.text-orange-700]="viewingTransaction.type === 'cash_out'">-->
+<!--                {{ viewingTransaction.type === 'cash_in' ? 'Cash In' : 'Cash Out' }}-->
+<!--              </span>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between">-->
+<!--                    <span class="text-sm text-primary-600">Amount:</span>-->
+<!--                    <span class="text-sm font-medium"-->
+<!--                          [class.text-green-600]="viewingTransaction.type === 'cash_in'"-->
+<!--                          [class.text-orange-600]="viewingTransaction.type === 'cash_out'">-->
+<!--                {{ viewingTransaction.type === 'cash_in' ? '+' : '-' }}-->
+<!--                        රු {{ viewingTransaction.amount | number:'1.2-2' }}-->
+<!--              </span>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between">-->
+<!--                    <span class="text-sm text-primary-600">Category:</span>-->
+<!--                    <span class="text-sm">{{ getCategoryName(viewingTransaction.categoryId) }}</span>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between">-->
+<!--                    <span class="text-sm text-primary-600">Subcategory:</span>-->
+<!--                    <span class="text-sm">{{ getSubcategoryName(viewingTransaction.subcategoryId) }}</span>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between">-->
+<!--                    <span class="text-sm text-primary-600">Payment Method:</span>-->
+<!--                    <span class="text-sm">{{ formatPaymentMethod(viewingTransaction.paymentMethod) }}</span>-->
+<!--                </div>-->
+<!--                <div *ngIf="viewingTransaction.chequeDetails" class="border-t pt-4">-->
+<!--                    <h4 class="text-sm font-medium mb-2">Cheque Details</h4>-->
+<!--                    <div class="space-y-2 text-sm">-->
+<!--                        <div class="flex justify-between">-->
+<!--                            <span class="text-primary-600">Cheque Number:</span>-->
+<!--                            <span>{{ viewingTransaction.chequeDetails.chequeNumber }}</span>-->
+<!--                        </div>-->
+<!--                        <div class="flex justify-between">-->
+<!--                            <span class="text-primary-600">Bank:</span>-->
+<!--                            <span>{{ viewingTransaction.chequeDetails.bankName }}</span>-->
+<!--                        </div>-->
+<!--                        <div class="flex justify-between">-->
+<!--                            <span class="text-primary-600">Date:</span>-->
+<!--                            <span>{{ viewingTransaction.chequeDetails.chequeDate | date:'yyyy-MM-dd' }}</span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between">-->
+<!--                    <span class="text-sm text-primary-600">Date:</span>-->
+<!--                    <span class="text-sm">{{ viewingTransaction.date | date:'yyyy-MM-dd HH:mm' }}</span>-->
+<!--                </div>-->
+<!--                <div *ngIf="viewingTransaction.description" class="border-t pt-4">-->
+<!--                    <span class="text-sm text-primary-600">Description:</span>-->
+<!--                    <p class="text-sm mt-1">{{ viewingTransaction.description }}</p>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->

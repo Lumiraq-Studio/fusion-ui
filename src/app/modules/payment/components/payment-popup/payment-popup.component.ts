@@ -1,9 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import { faArrowDown, faArrowUp, faTimes, faPlus, faCheck, faWallet, faCreditCard, faMoneyBill, faReceipt } from '@fortawesome/free-solid-svg-icons';
+import {Component, Input, Output, EventEmitter, OnInit, inject} from '@angular/core';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import { faArrowDown, faArrowUp, faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
 import {FaIconComponent} from "@fortawesome/angular-fontawesome";
-import {PaymentCategory, PaymentRecord} from "../../interfaces/payment-record.entity";
 import {NgIf} from "@angular/common";
+import {SalesPersonService} from "../../../sales-persons/services/sales-person.service";
 
 
 @Component({
@@ -11,7 +11,8 @@ import {NgIf} from "@angular/common";
     imports: [
         FaIconComponent,
         ReactiveFormsModule,
-        NgIf
+        NgIf,
+        FormsModule
     ],
     templateUrl: './payment-popup.component.html',
     styleUrl: './payment-popup.component.scss'
@@ -23,6 +24,8 @@ export class PaymentPopupComponent implements OnInit {
     @Output() close = new EventEmitter<void>();
     @Output() submit = new EventEmitter<any>(); // Adjust type as needed
     @Output() draft = new EventEmitter<any>(); // Adjust type as needed
+
+    salesPersonService = inject(SalesPersonService);
 
     // Icons
     protected readonly faArrowDown = faArrowDown;
@@ -69,8 +72,8 @@ export class PaymentPopupComponent implements OnInit {
             createdBy: this.paymentForm.value.createdBy,
             type: this.mode === 'cash_in' ? 'Income' : 'Expense'
         };
-
-        this.submit.emit(payload);
+        console.log(payload)
+        // this.submit.emit(payload);
         this.closePopup();
     }
 

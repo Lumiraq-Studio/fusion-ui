@@ -1,3 +1,5 @@
+import {ExpensesService} from "../../modules/payment/services/expenses.service";
+
 export enum APIRequestResources {
     AuthenticationService = 'auth',
     EmployeeService = 'employee',
@@ -15,5 +17,6 @@ export enum APIRequestResources {
     ApkService = 'apk',
     PaymentTermsService = 'payments-terms',
     ReportsService = 'reports',
+    ExpensesService = 'expenses',
 }
 
