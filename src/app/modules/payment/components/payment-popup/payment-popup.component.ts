@@ -1,9 +1,12 @@
-import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {faArrowDown, faArrowUp, faCheck, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {FaIconComponent} from "@fortawesome/angular-fontawesome";
 import {NgIf} from "@angular/common";
 import {SalesPersonService} from "../../../sales-persons/services/sales-person.service";
+import {AuthenticationService} from "../../../../core/modules/authentication/service/authentication.service";
+import {ExpensesService} from "../../services/expenses.service";
+import {LoadingService, NotificationService} from "../../../../core";
 
 
 @Component({
@@ -17,7 +20,15 @@ import {SalesPersonService} from "../../../sales-persons/services/sales-person.s
     templateUrl: './payment-popup.component.html',
     styleUrl: './payment-popup.component.scss'
 })
-export class PaymentPopupComponent implements OnInit {
+export class PaymentPopupComponent implements OnChanges {
+
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['mode'] && !changes['mode'].firstChange) {
+            this.setMode(this.mode);
+        }
+    }
+
     @Input() isOpen = false;
     @Input() mode: 'cash_in' | 'cash_out' = 'cash_in';
     @Input() editingRecord?: any; // Adjust type as needed, e.g., PaymentRecord
@@ -26,79 +37,72 @@ export class PaymentPopupComponent implements OnInit {
     @Output() draft = new EventEmitter<any>(); // Adjust type as needed
 
     salesPersonService = inject(SalesPersonService);
+    authenticationService = inject(AuthenticationService);
+    expensesService = inject(ExpensesService);
+    loading = inject(LoadingService);
+    notification = inject(NotificationService);
 
-    // Icons
-    protected readonly faArrowDown = faArrowDown;
-    protected readonly faArrowUp = faArrowUp;
-    protected readonly faTimes = faTimes;
-    protected readonly faCheck = faCheck;
+    userName: string = '';
 
-    paymentForm: FormGroup;
-
-    constructor(private fb: FormBuilder) {
-        this.paymentForm = this.fb.group({
-            amount: ['', [Validators.required, Validators.min(0.01)]],
-            description: [''],
-            salesRepId: ['', [Validators.required]],
-            createdBy: ['', [Validators.required]]
-        });
-    }
-
-    ngOnInit() {
-        if (this.editingRecord) {
-            this.loadEditingRecord();
+    constructor() {
+        const user = this.authenticationService.getUserInfo()
+        if (user) {
+            this.userName = user.userName
         }
     }
 
-    setMode(mode: 'cash_in' | 'cash_out') {
-        this.mode = mode;
-    }
+    amount: number | null = null;
+    description: string = '';
+    salesPerson: string = '';
+    cashOutType: string = '';
 
-    closePopup() {
-        this.paymentForm.reset();
-        this.close.emit();
+    setMode(mode: any) {
+        this.mode = mode;
+        if (mode === 'cash_in') {
+            // this.cashOutType = '';
+            this.resetForm()
+        }
     }
 
     onSubmit() {
-        if (this.paymentForm.invalid) {
-            this.paymentForm.markAllAsTouched();
-            return;
-        }
-
-        const payload = {
-            description: this.paymentForm.value.description,
-            amount: this.paymentForm.value.amount,
-            salesRepId: +this.paymentForm.value.salesRepId,
-            createdBy: this.paymentForm.value.createdBy,
-            type: this.mode === 'cash_in' ? 'Income' : 'Expense'
+        this.loading.set(true)
+        const formData = {
+            createdBy: this.userName,
+            amount: this.amount,
+            description: this.description,
+            salesPerson: this.mode === 'cash_in' ? 1 : Number(this.salesPerson),
+            type: this.mode === 'cash_out' ? this.cashOutType : (this.mode === 'cash_in' ? 'Income' : null)
         };
-        console.log(payload)
-        // this.submit.emit(payload);
-        this.closePopup();
+        this.expensesService.create(formData).subscribe({
+            next: (response) => {
+                this.notification.set({message: 'New record successfully saved', type: 'success'})
+                this.loading.set(false);
+                this.resetForm();
+                this.submit.emit(response.data);
+            },
+            error: (error) => {
+                this.notification.set({message: 'Failed to create record', type: 'error'})
+                this.loading.set(false);
+                console.error(error);
+            }
+        })
     }
 
-    saveDraft() {
-        const payload = {
-            description: this.paymentForm.value.description,
-            amount: this.paymentForm.value.amount,
-            salesRepId: +this.paymentForm.value.salesRepId,
-            createdBy: this.paymentForm.value.createdBy,
-            type: this.mode === 'cash_in' ? 'Income' : 'Expense'
-        };
 
-        this.draft.emit(payload);
-        this.closePopup();
+    closePopup() {
+        this.isOpen = false;
+        this.resetForm()
+        this.close.emit();
     }
 
-    private loadEditingRecord() {
-        if (this.editingRecord) {
-            this.mode = this.editingRecord.type === 'Income' ? 'cash_in' : 'cash_out';
-            this.paymentForm.patchValue({
-                amount: this.editingRecord.amount,
-                description: this.editingRecord.description,
-                salesRepId: this.editingRecord.salesRepId,
-                createdBy: this.editingRecord.createdBy
-            });
-        }
+    resetForm() {
+        this.amount = null;
+        this.description = '';
+        this.salesPerson = '';
     }
+
+    protected readonly faArrowUp = faArrowUp;
+    protected readonly faArrowDown = faArrowDown;
+    protected readonly faTimes = faTimes;
+    protected readonly faCheck = faCheck;
 }
