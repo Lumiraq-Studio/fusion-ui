@@ -68,7 +68,7 @@
                 </div>
                 <div class="relative mb-6">
                     <select class="form-input" [(ngModel)]="searchParams.salesRepId">
-                        <option value="" hidden selected disabled>Select Sales Person</option>
+                        <option value="" disabled hidden selected disabled>Select Sales Person</option>
                         <option value="">All Persons</option>
                         @for (person of salesPersonService.all(); track person) {
                             <option [value]="person.id">{{ person.name }}</option>
@@ -124,78 +124,6 @@
         </div>
     </div>
 
-    <!-- Right summary panel -->
-    <!--    <div class="w-80 border-l border-primary-100 p-6 bg-white min-h-screen">-->
-    <!--        <div class="space-y-6 divide-y divide-primary-100">-->
-    <!--            <div class="pb-6">-->
-    <!--                <h2 class="text-sm font-medium mb-4">TRANSACTION SUMMARY</h2>-->
-    <!--                <div class="space-y-4">-->
-    <!--                    <div class="flex justify-between items-center">-->
-    <!--                        <div class="text-sm text-primary-400">Total Transactions</div>-->
-    <!--                        <div class="text-sm font-semibold">{{ transactions.length }}</div>-->
-    <!--                    </div>-->
-    <!--                    <div class="flex justify-between items-center">-->
-    <!--                        <div class="text-sm text-primary-400">Average Transaction</div>-->
-    <!--                        <div class="text-sm font-semibold">රු {{ getAverageTransaction() | number:'1.2-2' }}-->
-    <!--                        </div>-->
-    <!--                    </div>-->
-    <!--                </div>-->
-    <!--            </div>-->
-
-    <!--            <div class="py-6">-->
-    <!--                <h2 class="text-sm font-medium mb-4">RECENT ACTIVITIES</h2>-->
-    <!--                <div class="space-y-4">-->
-    <!--                    <div *ngFor="let activity of getRecentActivities()" class="flex items-start gap-3">-->
-    <!--                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"-->
-    <!--                             [class.bg-green-100]="activity.type === 'cash_in'"-->
-    <!--                             [class.bg-orange-100]="activity.type === 'cash_out'">-->
-    <!--                            <fa-icon [icon]="activity.type === 'cash_in' ? faArrowDown : faArrowUp"-->
-    <!--                                     [class.text-green-600]="activity.type === 'cash_in'"-->
-    <!--                                     [class.text-orange-600]="activity.type === 'cash_out'"></fa-icon>-->
-    <!--                        </div>-->
-    <!--                        <div>-->
-    <!--                            <div class="text-sm font-medium">-->
-    <!--                                {{ activity.type === 'cash_in' ? 'Cash In' : 'Cash Out' }} - -->
-    <!--                                {{ activity.reference || generateTxnId(activity) }}-->
-    <!--                            </div>-->
-    <!--                            <div class="text-xs text-primary-400">{{ getTimeAgo(activity.date) }}</div>-->
-    <!--                        </div>-->
-    <!--                        <div class="text-sm font-medium ml-auto"-->
-    <!--                             [class.text-green-600]="activity.type === 'cash_in'"-->
-    <!--                             [class.text-orange-600]="activity.type === 'cash_out'">-->
-    <!--                            {{ activity.type === 'cash_in' ? '+' : '-' }}-->
-    <!--                            රු {{ activity.amount | number:'1.2-2' }}-->
-    <!--                        </div>-->
-    <!--                    </div>-->
-    <!--                    <div *ngIf="getRecentActivities().length === 0" class="text-sm text-primary-400">-->
-    <!--                        No recent activities-->
-    <!--                    </div>-->
-    <!--                </div>-->
-    <!--            </div>-->
-
-    <!--            <div class="pt-6">-->
-    <!--                <h2 class="text-sm font-medium mb-4">CASH FLOW ANALYSIS</h2>-->
-    <!--                <div class="grid grid-cols-2 gap-4">-->
-    <!--                    <div>-->
-    <!--                        <div class="text-2xl font-semibold text-green-600">{{ getCashInPercentage() }}%</div>-->
-    <!--                        <div class="text-sm text-primary-400">Cash In Rate</div>-->
-    <!--                    </div>-->
-    <!--                    <div>-->
-    <!--                        <div class="text-2xl font-semibold text-orange-600">{{ getCashOutPercentage() }}%</div>-->
-    <!--                        <div class="text-sm text-primary-400">Cash Out Rate</div>-->
-    <!--                    </div>-->
-    <!--                    <div>-->
-    <!--                        <div class="text-2xl font-semibold">රු {{ getWeeklyAverage() | number:'1.0-0' }}k</div>-->
-    <!--                        <div class="text-sm text-primary-400">Weekly Avg</div>-->
-    <!--                    </div>-->
-    <!--                    <div>-->
-    <!--                        <div class="text-2xl font-semibold">{{ getDailyTransactions() }}</div>-->
-    <!--                        <div class="text-sm text-primary-400">Daily Txns</div>-->
-    <!--                    </div>-->
-    <!--                </div>-->
-    <!--            </div>-->
-    <!--        </div>-->
-    <!--    </div>-->
 </div>
 
 <!-- Payment Popup -->
@@ -203,8 +131,8 @@
         [isOpen]="isPopupOpen"
         [mode]="popupMode"
         (close)="closePopup()"
->
-</app-payment-popup>
+></app-payment-popup>
+
 
 <!--&lt;!&ndash; Transaction Details Modal &ndash;&gt;-->
 <!--<div *ngIf="viewingTransaction"-->

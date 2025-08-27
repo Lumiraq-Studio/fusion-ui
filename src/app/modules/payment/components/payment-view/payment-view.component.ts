@@ -73,15 +73,17 @@ export class PaymentViewComponent {
 
     // Popup methods
     openCashIn() {
+        this.isPopupOpen = true;
         this.popupMode = 'cash_in';
         this.editingRecord = undefined;
-        this.isPopupOpen = true;
+
     }
 
     openCashOut() {
+        this.isPopupOpen = true;
         this.popupMode = 'cash_out';
         this.editingRecord = undefined;
-        this.isPopupOpen = true;
+
     }
 
     closePopup() {
@@ -139,7 +141,6 @@ export class PaymentViewComponent {
         this.expensesService.salesSummary(true).subscribe({
             next: (response) => {
               this.cashSummaryDTOS=[response.data]
-                console.log(this.cashSummaryDTOS)
             },
             error: (error) => {
                 console.error(error);
