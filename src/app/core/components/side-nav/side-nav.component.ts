@@ -1,19 +1,20 @@
-import { Component, signal, OnInit, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive } from "@angular/router";
-import { NgClass } from "@angular/common";
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {Component, inject, OnInit, signal} from '@angular/core';
+import {RouterLink, RouterLinkActive} from "@angular/router";
+import {NgClass} from "@angular/common";
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {
-    faGear,
-    faShoppingCart,
     faBoxes,
+    faCreditCard,
+    faGear,
     faLineChart,
-    faUsers,
     faMapLocationDot,
     faPeopleGroup,
     faPeopleRoof,
-    faCreditCard, faSignOut,
+    faShoppingCart,
+    faSignOut,
+    faUsers,
 } from '@fortawesome/free-solid-svg-icons';
-import { SettingsStorageService } from "../../services/settings-storage.service";
+import {SettingsStorageService} from "../../services/settings-storage.service";
 import {AuthenticationService} from "../../modules/authentication/service/authentication.service";
 
 @Component({

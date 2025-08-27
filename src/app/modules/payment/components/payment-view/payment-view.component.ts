@@ -59,24 +59,7 @@ export class PaymentViewComponent {
     salesRepExpenseDTOS: SalesRepExpenseDTO[] = []
     cashSummaryDTOS: CashSummaryDTO[] = []
     // Data
-    transactions: PaymentRecord[] = [
-        {
-            id: '2',
-            type: 'cash_out',
-            amount: 5000,
-            categoryId: 'raw_materials',
-            subcategoryId: 'wet_rice_flour',
-            paymentMethod: 'cheque',
-            description: 'Weekly flour purchase',
-            date: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-            reference: 'TRX-002',
-            chequeDetails: {
-                chequeNumber: '123456',
-                bankName: 'Bank of Ceylon',
-                chequeDate: new Date().toISOString().split('T')[0]
-            }
-        }
-    ];
+
 
     filteredTransactions: PaymentRecord[] = [];
     paginatedTransactions: PaymentRecord[] = [];
@@ -87,24 +70,6 @@ export class PaymentViewComponent {
         this.getSummary()
     }
 
-    get currentBalance(): number {
-        return this.transactions.reduce((balance, tx) =>
-            tx.type === 'cash_in' ? balance + tx.amount : balance - tx.amount, 0);
-    }
-
-    get todayCashIn(): number {
-        const today = new Date().toDateString();
-        return this.transactions
-            .filter(tx => tx.type === 'cash_in' && new Date(tx.date).toDateString() === today)
-            .reduce((sum, tx) => sum + tx.amount, 0);
-    }
-
-    get todayCashOut(): number {
-        const today = new Date().toDateString();
-        return this.transactions
-            .filter(tx => tx.type === 'cash_out' && new Date(tx.date).toDateString() === today)
-            .reduce((sum, tx) => sum + tx.amount, 0);
-    }
 
     // Popup methods
     openCashIn() {

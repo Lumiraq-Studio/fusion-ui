@@ -2,12 +2,15 @@ import {AfterViewInit, Component, EventEmitter, HostListener, inject, Output} fr
 import {FaIconComponent} from "@fortawesome/angular-fontawesome";
 import {
     faBell,
-    faBoxes, faCog, faCreditCard, faDashboard,
-    faHome,
+    faBoxes,
+    faCog,
+    faCreditCard,
+    faDashboard,
     faLineChart,
     faMapLocationDot,
     faMobileAndroid,
-    faPeopleRoof, faQuestionCircle,
+    faPeopleRoof,
+    faQuestionCircle,
     faSearch,
     faShoppingCart,
     faSignOut,

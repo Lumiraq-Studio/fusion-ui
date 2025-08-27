@@ -21,7 +21,7 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <div class="text-sm text-primary-400 mb-1">Cash in Hand</div>
-                        <div class="text-2xl font-semibold">රු {{ cashSummaryDTOS[0].cashInHand | number:'1.2-2' }}</div>
+                        <div class="text-2xl font-semibold">රු {{ cashSummaryDTOS[0].cashInHand || 0.00 | number:'1.2-2' }}</div>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
                         <fa-icon [icon]="faWallet" class="text-green-600"></fa-icon>
@@ -33,7 +33,7 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <div class="text-sm text-primary-400 mb-1">Today's Cash In</div>
-                        <div class="text-2xl font-semibold">රු {{ cashSummaryDTOS[0].cashOnHand | number:'1.2-2' }}</div>
+                        <div class="text-2xl font-semibold">රු {{ cashSummaryDTOS[0].cashOnHand || 0.00 | number:'1.2-2' }}</div>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                         <fa-icon [icon]="faArrowDown" class="text-blue-600"></fa-icon>
@@ -45,7 +45,7 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <div class="text-sm text-primary-400 mb-1">Today's Cash Out</div>
-                        <div class="text-2xl font-semibold">රු {{ cashSummaryDTOS[0].todayCashOut | number:'1.2-2' }}</div>
+                        <div class="text-2xl font-semibold">රු {{ cashSummaryDTOS[0].todayCashOut || 0.00 | number:'1.2-2' }}</div>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
                         <fa-icon [icon]="faArrowUp" class="text-orange-600"></fa-icon>

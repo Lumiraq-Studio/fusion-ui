@@ -3,7 +3,6 @@ import {InitialDataResolver} from "./core/resolvers/initial-data.resolver";
 import {authGuard} from "./core/guards/auth.guard";
 import {LayoutComponent} from "./core/components/layout/layout.component";
 import {publicGuard} from "./core/guards/public.guard";
-import {DashboardModule} from "./modules";
 
 export const routes: Routes = [
     {

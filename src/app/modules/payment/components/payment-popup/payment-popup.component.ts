@@ -1,6 +1,6 @@
-import {Component, Input, Output, EventEmitter, OnInit, inject} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import { faArrowDown, faArrowUp, faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
+import {faArrowDown, faArrowUp, faCheck, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {FaIconComponent} from "@fortawesome/angular-fontawesome";
 import {NgIf} from "@angular/common";
 import {SalesPersonService} from "../../../sales-persons/services/sales-person.service";

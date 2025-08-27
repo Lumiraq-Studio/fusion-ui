@@ -1,8 +1,8 @@
 import {Injectable, signal} from "@angular/core";
 import {CachedAPIRequest} from "../../../classes";
-import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {APIRequestResources} from "../../../enums";
-import {Observable, of, tap} from "rxjs";
+import {tap} from "rxjs";
 import {AuthResponse, UserInfo} from "../interfaces/authentication.entity";
 import {Router} from "@angular/router";
 

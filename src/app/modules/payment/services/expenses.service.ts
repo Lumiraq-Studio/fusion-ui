@@ -5,9 +5,7 @@ import {BehaviorSubject, finalize, tap} from "rxjs";
 import {toSignal} from "@angular/core/rxjs-interop";
 import {take} from "rxjs/operators";
 import {APIRequestResources, CachedAPIRequest, LoadingService, PaginationResponse} from "../../../core";
-import {PriceDTO} from "../../reports/interfaces/report.entity";
-import {SalesSummaryDTO} from "../../dashboard/interface/sales-summary.entity";
-import {FindOrderDTO, GetOrderDTO} from "../../orders/interfaces/order.entity";
+import {GetOrderDTO} from "../../orders/interfaces/order.entity";
 import {CashSummaryDTO, SalesRepExpenseDTO} from "../interfaces/expenses.entity";
 
 

@@ -6,7 +6,6 @@ import {toSignal} from "@angular/core/rxjs-interop";
 import {take} from "rxjs/operators";
 import {FindOrderDTO, GetOrderDTO} from "../interfaces/order.entity";
 import {APIRequestResources, CachedAPIRequest, LoadingService, PaginationResponse} from "../../../core";
-import {PriceDTO} from "../../reports/interfaces/report.entity";
 import {SalesSummaryDTO} from "../../dashboard/interface/sales-summary.entity";
 
 
