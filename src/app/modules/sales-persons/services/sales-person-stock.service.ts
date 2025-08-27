@@ -1,10 +1,9 @@
 import {inject, Injectable} from "@angular/core";
-import {APIRequestResources, CachedAPIRequest, LoadingService, PaginationResponse} from "../../../core";
+import {APIRequestResources, CachedAPIRequest, LoadingService} from "../../../core";
 import {HttpClient} from "@angular/common/http";
 import {BehaviorSubject, finalize, tap} from "rxjs";
 import {toSignal} from "@angular/core/rxjs-interop";
 import {SalesRepStockFind, SalesRepStockGet, ViewRepStockDTO} from "../interfaces/sales-person-stock.entity";
-import {take} from "rxjs/operators";
 import {SalesRepStockDto} from "../interfaces/sales-person.entity";
 
 

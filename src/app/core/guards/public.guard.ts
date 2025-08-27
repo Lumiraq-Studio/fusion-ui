@@ -10,10 +10,11 @@ export const publicGuard: CanActivateFn = async (route, state): Promise<boolean 
     const isAuthenticated = authService.isAuthenticated();
 
     if (isAuthenticated) {
+      // Redirect authenticated users to dashboard
       return router.createUrlTree(['/dashboard']);
     }
 
-    return true;
+    return true; // Allow access to public routes (e.g., login) for unauthenticated users
   } catch (error) {
     console.error('Error in public guard:', error);
     return router.createUrlTree(['/dashboard']);

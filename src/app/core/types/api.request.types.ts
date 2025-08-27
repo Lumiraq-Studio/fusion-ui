@@ -15,6 +15,7 @@ export type APIRequestResource =
     APIRequestResources.ApkService |
     APIRequestResources.ScreenSummaryService |
     APIRequestResources.PaymentTermsService |
+    APIRequestResources.ExpensesService |
     APIRequestResources.ReportsService
 
 

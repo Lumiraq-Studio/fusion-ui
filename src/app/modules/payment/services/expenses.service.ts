@@ -4,20 +4,20 @@ import {Router} from "@angular/router";
 import {BehaviorSubject, finalize, tap} from "rxjs";
 import {toSignal} from "@angular/core/rxjs-interop";
 import {take} from "rxjs/operators";
-import {FindOrderDTO, GetOrderDTO} from "../interfaces/order.entity";
 import {APIRequestResources, CachedAPIRequest, LoadingService, PaginationResponse} from "../../../core";
-import {SalesSummaryDTO} from "../../dashboard/interface/sales-summary.entity";
+import {GetOrderDTO} from "../../orders/interfaces/order.entity";
+import {CashSummaryDTO, SalesRepExpenseDTO} from "../interfaces/expenses.entity";
 
 
 @Injectable({
     providedIn: 'root'
 })
-export class OrderService extends CachedAPIRequest {
+export class ExpensesService extends CachedAPIRequest {
 
-    $all = new BehaviorSubject<FindOrderDTO[]>([]);
+    $all = new BehaviorSubject<SalesRepExpenseDTO[]>([]);
     all = toSignal(this.$all, {initialValue: []});
 
-    $summary = new BehaviorSubject<SalesSummaryDTO[]>([]);
+    $summary = new BehaviorSubject<CashSummaryDTO[]>([]);
     summary = toSignal(this.$summary, {initialValue: []});
 
     $active = new BehaviorSubject<GetOrderDTO | undefined>(undefined);
@@ -26,12 +26,12 @@ export class OrderService extends CachedAPIRequest {
     private loading = inject(LoadingService);
 
     constructor(protected override http: HttpClient, private router: Router) {
-        super(http, APIRequestResources.OrderService)
+        super(http, APIRequestResources.ExpensesService)
     }
 
     find = (searchParams: any, refresh = true) => {
         this.loading.set(true);
-        return this.get<PaginationResponse<FindOrderDTO[]>>({
+        return this.get<PaginationResponse<SalesRepExpenseDTO[]>>({
             endpoint: `find`,
             params: searchParams,
         }, refresh ? 'freshness' : 'performance')
@@ -73,12 +73,12 @@ export class OrderService extends CachedAPIRequest {
         this.$active.next(undefined)
     }
 
-    salesSummary = (dateValue: any, refresh = true) => {
-        return this.get<SalesSummaryDTO[]>({
-            endpoint: `summary/${dateValue}`
+    salesSummary = (refresh = true) => {
+        return this.get<CashSummaryDTO>({
+            endpoint: `summary`
         }, refresh ? 'freshness' : 'performance')
             .pipe(
-                tap((res) => this.$summary.next(res.data)),
+
             )
     }
 

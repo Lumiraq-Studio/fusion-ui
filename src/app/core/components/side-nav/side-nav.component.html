@@ -1,12 +1,10 @@
 <div class="flex h-screen bg-gray-50">
-    <!-- Sidebar for Desktop Only -->
     <div class="relative">
         <div
                 class="w-16 transition-all duration-300 ease-in-out bg-black text-white flex flex-col shadow-2xl h-full"
                 [class.hover:w-64]="!isLocked()"
                 [class.group]="!isLocked()"
         >
-            <!-- Header -->
             <div class="p-4 border-b border-gray-800">
                 <div class="flex items-center space-x-3">
                     <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
@@ -87,29 +85,28 @@
                 </div>
             </nav>
 
-            <!-- User Section -->
-            <div class="border-t border-gray-800 p-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span class="text-white font-semibold text-sm">TR</span>
+
+            @if (!isLocked()) {
+                <div class="flex-none border-t border-gray-700">
+                    <div class="relative group">
+                        <div class="flex items-center gap-3 px-3 py-2 cursor-pointer"
+                        >
+                            <div class="flex-1 transition-all duration-300 overflow-hidden whitespace-nowrap">
+                                <div class="text-sm font-medium text-white group-hover:-translate-y-12 transition-transform duration-300">
+                                    {{userName()}}
+                                </div>
+
+                                <div class="absolute p-4 inset-x-0 translate-y-12 group-hover:-translate-y-6 transition-all duration-300 py-2 hidden group-hover:block">
+                                    <button class="flex items-center gap-3 text-primary-100 hover:text-primary-50 text-sm w-full" (click)="logout()">
+                                        <fa-icon [icon]="faSignOut" class="w-5 h-5"></fa-icon>
+                                        <span class="transition-all duration-300">Logout</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div
-                            class="flex-1 transition-opacity duration-300 whitespace-nowrap"
-                            [class.opacity-0]="true"
-                            [class.group-hover:opacity-100]="!isLocked()"
-                    >
-                        <p class="text-sm font-medium text-white">Soori</p>
-                        <p class="text-xs text-gray-400">System Admin</p>
-                    </div>
-                    <button
-                            class="transition-opacity duration-300 text-gray-400 hover:text-white"
-                            [class.opacity-0]="true"
-                            [class.group-hover:opacity-100]="!isLocked()"
-                    >
-                        <fa-icon icon="right-from-bracket" class="w-5 h-5"></fa-icon>
-                    </button>
                 </div>
-            </div>
+            }
         </div>
     </div>
 

@@ -3,26 +3,24 @@ import {InitialDataResolver} from "./core/resolvers/initial-data.resolver";
 import {authGuard} from "./core/guards/auth.guard";
 import {LayoutComponent} from "./core/components/layout/layout.component";
 import {publicGuard} from "./core/guards/public.guard";
-import {DashboardModule} from "./modules";
 
 export const routes: Routes = [
-    // {
-    //     path: 'login',
-    //     canActivate: [publicGuard],
-    //     data: {
-    //         title: 'Sign In',
-    //         animation: 'fadeIn'
-    //     },
-    //     resolve: {
-    //         initialData: InitialDataResolver
-    //     },
-    //     loadChildren: () => import('./core/modules/authentication/authentication.module')
-    //         .then(m => m.AuthenticationModule)
-    // },
+    {
+        path: 'login',
+        canActivate: [publicGuard],
+        data: {
+            title: 'Sign In',
+            animation: 'fadeIn'
+        },
+        resolve: {
+            initialData: InitialDataResolver
+        },
+        loadChildren: () => import('./core/modules/authentication/authentication.module').then(m => m.AuthenticationModule)
+    },
     {
         path: '',
         component: LayoutComponent,
-        // canActivate: [authGuard],
+        canActivate: [authGuard],
         children: [
             {
                 path: '',
@@ -99,7 +97,7 @@ export const routes: Routes = [
     },
     {
         path: '**',
-        redirectTo: 'dashboard'
+        redirectTo: 'login'
     }
 
 ];

@@ -4,7 +4,6 @@ import {faPlus, faSearch} from "@fortawesome/free-solid-svg-icons";
 import {OrderService} from "../../../orders/services/order.service";
 import {LoadingService, NotificationService} from "../../../../core";
 import {FormsModule} from "@angular/forms";
-import {TitleCasePipe} from "@angular/common";
 
 
 @Component({

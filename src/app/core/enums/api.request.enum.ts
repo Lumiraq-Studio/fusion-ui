@@ -15,5 +15,6 @@ export enum APIRequestResources {
     ApkService = 'apk',
     PaymentTermsService = 'payments-terms',
     ReportsService = 'reports',
+    ExpensesService = 'expenses',
 }
 
