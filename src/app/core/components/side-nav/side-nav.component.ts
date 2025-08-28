@@ -34,7 +34,7 @@ export class SideNavComponent implements OnInit {
     private settingsStorage = inject(SettingsStorageService);
     private authService = inject(AuthenticationService);
 
-    isLocked = signal(false);
+    isLocked = signal(true);
     showSettings = signal(false);
 
     navItems = signal([
@@ -107,6 +107,14 @@ export class SideNavComponent implements OnInit {
         name: 'Settings',
         link: '/settings',
         icon: faGear, // FontAwesome icon
+        iconPath: undefined, // Will use FA icon since icon is provided
+        enabled: true
+    });
+
+    signOutItem = signal({
+        name: 'SignOut',
+        link: '/settings',
+        icon: faSignOut, // FontAwesome icon
         iconPath: undefined, // Will use FA icon since icon is provided
         enabled: true
     });
