@@ -1,35 +1,36 @@
-import {Component, inject} from '@angular/core';
-import {FaIconComponent} from "@fortawesome/angular-fontawesome";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {OrderService} from "../../../orders/services/order.service";
-import {LoadingService, NotificationService} from "../../../../core";
-import {faSearch, faTimes} from "@fortawesome/free-solid-svg-icons";
-import {DecimalPipe} from "@angular/common";
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { FaIconComponent } from "@fortawesome/angular-fontawesome";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { OrderService } from "../../../orders/services/order.service";
+import { LoadingService, NotificationService } from "../../../../core";
+import { faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { DecimalPipe } from "@angular/common";
 
 @Component({
-  selector: 'app-daily-sales-summery',
+    selector: 'app-daily-sales-summery',
+    templateUrl: './daily-sales-summery.component.html',
+    styleUrls: ['./daily-sales-summery.component.scss'],
+    standalone: true,
     imports: [
         FaIconComponent,
         ReactiveFormsModule,
         FormsModule,
         DecimalPipe
-    ],
-  templateUrl: './daily-sales-summery.component.html',
-  styleUrl: './daily-sales-summery.component.scss'
+    ]
 })
 export class DailySalesSummeryComponent {
-
     orderService = inject(OrderService);
     loading = inject(LoadingService);
     notification = inject(NotificationService);
-    
-    isOpen = false;
+
+    @Input() isOpen = false;
+    @Output() closed = new EventEmitter<void>();
+
+    salesDate = '';
 
     constructor() {
-        this.getSalesSummary()
+        this.getSalesSummary();
     }
-
-    salesDate = ''
 
     getSalesSummary() {
         if (!this.salesDate) {
@@ -39,6 +40,10 @@ export class DailySalesSummeryComponent {
         this.orderService.salesSummary(this.salesDate, true).subscribe();
     }
 
+    close() {
+        this.isOpen = false;
+        this.closed.emit(); // notify parent
+    }
 
     protected readonly faSearch = faSearch;
     protected readonly faTimes = faTimes;
