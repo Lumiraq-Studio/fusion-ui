@@ -4,13 +4,15 @@ import {faPlus, faSearch} from "@fortawesome/free-solid-svg-icons";
 import {OrderService} from "../../../orders/services/order.service";
 import {LoadingService, NotificationService} from "../../../../core";
 import {FormsModule} from "@angular/forms";
+import {DailySalesSummeryComponent} from "../daily-sales-summery/daily-sales-summery.component";
 
 
 @Component({
     selector: 'app-dashboard-view',
     imports: [
         FaIconComponent,
-        FormsModule
+        FormsModule,
+        DailySalesSummeryComponent
     ],
     templateUrl: './dashboard-view.component.html',
     standalone: true,
@@ -19,26 +21,5 @@ import {FormsModule} from "@angular/forms";
 export class DashboardViewComponent {
 
 
-    orderService = inject(OrderService);
-    loading = inject(LoadingService);
-    notification = inject(NotificationService);
-
-    constructor() {
-        this.getSalesSummary()
-    }
-
-    salesDate = ''
-
-    getSalesSummary() {
-        if (!this.salesDate) {
-            const currentDate = new Date();
-            this.salesDate = currentDate.toISOString().split('T')[0];
-        }
-        this.orderService.salesSummary(this.salesDate, true).subscribe();
-    }
-
-
-    protected readonly faSearch = faSearch;
-    protected readonly faPlus = faPlus;
 
 }
