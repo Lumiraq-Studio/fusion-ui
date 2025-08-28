@@ -60,6 +60,7 @@ export class DashboardViewComponent implements AfterViewInit, OnDestroy {
 
     statisticsService = inject(StatisticsService)
 
+    openSummary = false;
 
     // Dashboard metrics
     totalRevenue = 0;

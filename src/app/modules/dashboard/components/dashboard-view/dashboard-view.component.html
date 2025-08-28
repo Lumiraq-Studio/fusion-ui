@@ -16,14 +16,14 @@
             </div>
 
             <!-- Total Orders -->
-            <div class="bg-white rounded-lg border border-primary-100 p-4">
-                <div class="flex justify-between items-center">
+            <div (click)="openSummary = true" class="bg-white  cursor-pointer rounded-lg border border-primary-100 p-4">
+                <div class="flex  cursor-pointer justify-between items-center">
                     <div>
                         <div class="text-sm text-primary-400 mb-1">Total Orders</div>
                         <div class="text-2xl font-semibold">{{ totalOrders | number }}</div>
                         <div class="text-xs text-green-600 mt-1">{{ CustomerChangePercentage }} than last month</div>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                    <div class="w-10 h-10 rounded-full cursor-pointer bg-blue-100 flex items-center justify-center">
                         <fa-icon [icon]="faShoppingCart" class="text-blue-600"></fa-icon>
                     </div>
                 </div>
@@ -162,6 +162,10 @@
     </div>
 </div>
 
-<app-daily-sales-summery></app-daily-sales-summery>
+
+<app-daily-sales-summery
+        [isOpen]="openSummary"
+        (closed)="openSummary = false">
+</app-daily-sales-summery>
 
 
