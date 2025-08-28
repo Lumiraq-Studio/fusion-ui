@@ -24,12 +24,12 @@ export interface BaseStatistics {
 
 export interface SalesWeekItem {
     WeekDay: string;
-    TotalRevenue: number;
-    TotalExpense: number;
+    TotalSales: string;
+    TotalExpenses: string;
 }
 
 export interface MonthlyPerformanceItem {
     MonthShort: string;
-    MonthlyRevenue: number;
-    OrdersCount: number;
+    MonthlyRevenue: string;
+    OrdersCount: string;
 }

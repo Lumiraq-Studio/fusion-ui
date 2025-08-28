@@ -7,7 +7,7 @@
                     <div>
                         <div class="text-sm text-primary-400 mb-1">Total Revenue</div>
                         <div class="text-2xl font-semibold">රු {{ totalRevenue | number:'1.2-2' }}</div>
-                        <div class="text-xs text-green-600 mt-1">+12.5% from last month</div>
+                        <div class="text-xs text-green-600 mt-1">{{ RevenueChangePercentage }} than last month</div>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
                         <fa-icon [icon]="faDollarSign" class="text-green-600"></fa-icon>
@@ -21,7 +21,7 @@
                     <div>
                         <div class="text-sm text-primary-400 mb-1">Total Orders</div>
                         <div class="text-2xl font-semibold">{{ totalOrders | number }}</div>
-                        <div class="text-xs text-green-600 mt-1">+8.2% from last month</div>
+                        <div class="text-xs text-green-600 mt-1">{{ CustomerChangePercentage }} than last month</div>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                         <fa-icon [icon]="faShoppingCart" class="text-blue-600"></fa-icon>
@@ -35,7 +35,7 @@
                     <div>
                         <div class="text-sm text-primary-400 mb-1">Active Customers</div>
                         <div class="text-2xl font-semibold">{{ activeCustomers | number }}</div>
-                        <div class="text-xs text-green-600 mt-1">+15.3% from last month</div>
+                        <div class="text-xs text-green-600 mt-1">{{ CustomerChangePercentage }} than last month</div>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
                         <fa-icon [icon]="faUsers" class="text-purple-600"></fa-icon>
@@ -49,7 +49,7 @@
                     <div>
                         <div class="text-sm text-primary-400 mb-1">Unpaid Orders</div>
                         <div class="text-2xl font-semibold">{{ pendingOrders | number }}</div>
-                        <div class="text-xs text-orange-600 mt-1">{{ pendingOrders }} need attention</div>
+                        <div class="text-xs text-orange-600 mt-1">{{ UnpaidOrdersOverMonth }} need attention</div>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
                         <fa-icon [icon]="faClock" class="text-orange-600"></fa-icon>
@@ -75,10 +75,10 @@
 
 
         <!-- Sales Rep Performance -->
-        <div class="bg-white rounded-lg border border-primary-100 p-6 mt-6">
+        <div class="bg-white rounded-lg border opacity-30 cursor-not-allowed border-primary-100 p-6 mt-6">
             <h3 class="text-lg font-semibold mb-4">Sales Rep Performance</h3>
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="w-full ">
                     <thead>
                     <tr>
                         <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Sales Rep</th>
@@ -88,9 +88,9 @@
                         <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Achievement</th>
                     </tr>
                     </thead>
-                    <tbody class="divide-y divide-primary-100">
+                    <tbody class="divide-y cursor-not-allowed divide-primary-100">
                         @for (rep of salesReps; track rep.id) {
-                            <tr class="hover:bg-primary-50 cursor-pointer" (click)="toggleSalesRepExpansion(rep.id)">
+                            <tr class="hover:bg-primary-50 cursor-not-allowed" (click)="toggleSalesRepExpansion(rep.id)">
                                 <td class="px-4 py-3 text-sm">
                                     <div class="flex items-center">
                                         <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center mr-3">
@@ -119,7 +119,7 @@
                             </tr>
                             @if (rep.expanded) {
                                 <tr>
-                                    <td colspan="5" class="px-4 py-0">
+                                    <td colspan="5" class="px-4 cursor-not-allowed py-0">
                                         <div class="bg-gray-50 rounded-lg p-4 mb-2">
                                             <h4 class="text-sm font-semibold mb-3 text-primary-700">Route Performance</h4>
                                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
