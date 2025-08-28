@@ -1,0 +1,195 @@
+// Dashboard specific styles
+.dashboard {
+  &-card {
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &-metric {
+    .metric-icon {
+      transition: transform 0.3s ease;
+    }
+
+    &:hover .metric-icon {
+      transform: scale(1.1);
+    }
+  }
+}
+
+// Chart containers
+#salesChart,
+#categoryChart,
+#monthlyChart {
+  .apexcharts-canvas {
+    margin: 0 auto;
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .dashboard-header {
+    .btn {
+      font-size: 14px;
+      padding: 8px 16px;
+
+      fa-icon {
+        margin-right: 4px;
+      }
+    }
+  }
+
+  .dashboard-metrics {
+    .metric-card {
+      padding: 16px;
+
+      .metric-value {
+        font-size: 20px;
+      }
+
+      .metric-icon {
+        width: 32px;
+        height: 32px;
+      }
+    }
+  }
+
+  .dashboard-charts {
+    .chart-container {
+      margin-bottom: 24px;
+
+      h3 {
+        font-size: 16px;
+        margin-bottom: 16px;
+      }
+    }
+  }
+
+  .recent-activities {
+    .activity-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+
+      .activity-details {
+        flex: 1;
+      }
+
+      .activity-amount {
+        align-self: flex-end;
+      }
+    }
+  }
+
+  .sales-table {
+    font-size: 12px;
+
+    th,
+    td {
+      padding: 8px 12px;
+    }
+  }
+}
+
+// Progress bar animation
+.progress-bar {
+  transition: width 1s ease-in-out;
+  animation: progressLoad 2s ease-in-out;
+}
+
+@keyframes progressLoad {
+  from {
+    width: 0%;
+  }
+  to {
+    width: var(--progress-width);
+  }
+}
+
+// Status badges
+.status-badge {
+  &.completed {
+    @apply bg-green-100 text-green-800;
+  }
+
+  &.pending {
+    @apply bg-orange-100 text-orange-800;
+  }
+
+  &.processing {
+    @apply bg-blue-100 text-blue-800;
+  }
+}
+
+// Custom scrollbar for tables
+.table-container {
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+
+    &:hover {
+      background: #94a3b8;
+    }
+  }
+}
+
+// Loading states
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Chart responsive styles
+@media (max-width: 640px) {
+  #salesChart,
+  #categoryChart,
+  #monthlyChart {
+    .apexcharts-canvas {
+      max-width: 100% !important;
+    }
+
+    .apexcharts-legend {
+      flex-wrap: wrap !important;
+
+      .apexcharts-legend-series {
+        margin: 2px 8px !important;
+      }
+    }
+  }
+}
+
+// Button hover effects
+.btn {
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}

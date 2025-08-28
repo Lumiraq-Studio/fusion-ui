@@ -3,14 +3,16 @@ import {FaIconComponent} from "@fortawesome/angular-fontawesome";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {OrderService} from "../../../orders/services/order.service";
 import {LoadingService, NotificationService} from "../../../../core";
-import {faSearch} from "@fortawesome/free-solid-svg-icons";
+import {faSearch, faTimes} from "@fortawesome/free-solid-svg-icons";
+import {DecimalPipe} from "@angular/common";
 
 @Component({
   selector: 'app-daily-sales-summery',
     imports: [
         FaIconComponent,
         ReactiveFormsModule,
-        FormsModule
+        FormsModule,
+        DecimalPipe
     ],
   templateUrl: './daily-sales-summery.component.html',
   styleUrl: './daily-sales-summery.component.scss'
@@ -20,6 +22,8 @@ export class DailySalesSummeryComponent {
     orderService = inject(OrderService);
     loading = inject(LoadingService);
     notification = inject(NotificationService);
+    
+    isOpen = false;
 
     constructor() {
         this.getSalesSummary()
@@ -37,4 +41,5 @@ export class DailySalesSummeryComponent {
 
 
     protected readonly faSearch = faSearch;
+    protected readonly faTimes = faTimes;
 }
