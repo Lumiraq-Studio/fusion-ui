@@ -1,0 +1,73 @@
+@if (isOpen){
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg border border-primary-100 p-6 w-full max-w-4xl mx-4">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold text-primary-700">Sales Summary</h1>
+            <button class="btn btn-outline" (click)="isOpen = false">
+                <fa-icon [icon]="faTimes" class="mr-2"></fa-icon>
+                Close
+            </button>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="flex gap-3 mb-6">
+            <div class="relative">
+                <input
+                        type="date"
+                        [(ngModel)]="salesDate"
+                        placeholder="Order Date"
+                        class="form-input w-full px-4 py-2 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400"
+                />
+            </div>
+            <div class="relative">
+                <button class="btn btn-primary" (click)="getSalesSummary()">
+                    <fa-icon [icon]="faSearch" class="mr-2"></fa-icon>
+                    Search
+                </button>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg border border-primary-100 p-4">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="mb-6">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Sales Rep Name</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Order Date</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Total Orders</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Total Sale</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Cash on Hand</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-primary-600">Unpaid Amount</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-primary-100">
+                        @if (orderService.summary().length === 0) {
+                            <tr>
+                                <td colspan="6" class="px-6 py-10">
+                                    <div class="flex flex-col items-center justify-center text-center">
+                                        <p class="text-xl font-semibold text-gray-700 mb-2">No Orders found</p>
+                                        <p class="text-gray-500">We couldn't find any orders that match your search criteria.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        } @else {
+                            @for (order of orderService.summary(); track order.salesRepName) {
+                                <tr class="hover:bg-primary-50">
+                                    <td class="px-4 py-3 text-sm">{{ order.salesRepName }}</td>
+                                    <td class="px-4 py-3 text-sm">{{ order.orderDate }}</td>
+                                    <td class="px-4 py-3 text-sm">{{ order.totalOrders | number }}</td>
+                                    <td class="px-4 py-3 text-sm">Rs. {{ order.totalSales | number:'1.2-2' }}</td>
+                                    <td class="px-4 py-3 text-sm">Rs. {{ order.cashOnHand | number:'1.2-2' }}</td>
+                                    <td class="px-4 py-3 text-sm">Rs. {{ order.unpaidAmount | number:'1.2-2' }}</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+}
