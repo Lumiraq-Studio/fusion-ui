@@ -1,3 +1,5 @@
+import {StatisticsService} from "../../modules/dashboard/services/statistics.service";
+
 export enum APIRequestResources {
     AuthenticationService = 'auth',
     EmployeeService = 'employee',
@@ -16,5 +18,6 @@ export enum APIRequestResources {
     PaymentTermsService = 'payments-terms',
     ReportsService = 'reports',
     ExpensesService = 'expenses',
+    StatisticsService = 'statistics',
 }
 

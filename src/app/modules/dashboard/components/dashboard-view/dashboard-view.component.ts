@@ -1,44 +1,417 @@
-import {Component, inject} from '@angular/core';
-import {FaIconComponent} from "@fortawesome/angular-fontawesome";
-import {faPlus, faSearch} from "@fortawesome/free-solid-svg-icons";
-import {OrderService} from "../../../orders/services/order.service";
-import {LoadingService, NotificationService} from "../../../../core";
-import {FormsModule} from "@angular/forms";
+import {Component, AfterViewInit, OnDestroy, Inject, inject} from '@angular/core';
+import {FaIconComponent} from '@fortawesome/angular-fontawesome';
+import {
+    faPlus,
+    faSearch,
+    faDollarSign,
+    faShoppingCart,
+    faUsers,
+    faClock,
+    faChevronDown,
+    faChevronUp,
+} from '@fortawesome/free-solid-svg-icons';
+import {FormsModule} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import ApexCharts from 'apexcharts';
+import {DailySalesSummeryComponent} from "../daily-sales-summery/daily-sales-summery.component";
+import {StatisticsService} from "../../services/statistics.service";
+import {SettingsStorageService} from "../../../../core/services/settings-storage.service";
+import {forkJoin} from "rxjs";
+import {MonthlyPerformanceItem, SalesWeekItem} from "../../interface/sales-summary.entity";
 
+// Define interfaces for type safety
+interface Route {
+    id: number;
+    name: string;
+    revenue: number;
+    orders: number;
+    customers: number;
+    achievementPercentage: number;
+}
+
+interface SalesRep {
+    id: number;
+    name: string;
+    orders: number;
+    revenue: number;
+    target: number;
+    achievementPercentage: number;
+    expanded?: boolean;
+    routes: Route[];
+}
 
 @Component({
     selector: 'app-dashboard-view',
-    imports: [
-        FaIconComponent,
-        FormsModule
-    ],
-    templateUrl: './dashboard-view.component.html',
     standalone: true,
-    styleUrl: './dashboard-view.component.scss'
+    imports: [FaIconComponent, FormsModule, CommonModule, DailySalesSummeryComponent],
+    templateUrl: './dashboard-view.component.html',
+    styleUrls: ['./dashboard-view.component.scss'],
 })
-export class DashboardViewComponent {
+export class DashboardViewComponent implements AfterViewInit, OnDestroy {
+    // Font Awesome icons
+    faPlus = faPlus;
+    faSearch = faSearch;
+    faDollarSign = faDollarSign;
+    faShoppingCart = faShoppingCart;
+    faUsers = faUsers;
+    faClock = faClock;
+    faChevronDown = faChevronDown;
+    faChevronUp = faChevronUp;
 
+    statisticsService = inject(StatisticsService)
 
-    orderService = inject(OrderService);
-    loading = inject(LoadingService);
-    notification = inject(NotificationService);
+    openSummary = false;
+
+    // Dashboard metrics
+    totalRevenue = 0;
+    totalOrders = 0;
+    CustomerChangePercentage = 0;
+    activeCustomers = 0;
+    pendingOrders = 0;
+    UnpaidOrdersOverMonth = 0;
+    RevenueChangePercentage = 0;
+
+    // Sales reps data
+    salesReps: SalesRep[] = [
+        {
+            id: 1,
+            name: 'Ajith Kumara',
+            orders: 127,
+            revenue: 385000.0,
+            target: 400000.0,
+            achievementPercentage: 96.25,
+            expanded: false,
+            routes: [
+                {id: 1, name: 'Colombo Central', revenue: 145000, orders: 45, customers: 28, achievementPercentage: 95},
+                {id: 2, name: 'Colombo North', revenue: 128000, orders: 38, customers: 22, achievementPercentage: 88},
+                {id: 3, name: 'Colombo West', revenue: 112000, orders: 44, customers: 31, achievementPercentage: 102},
+            ],
+        },
+        {
+            id: 2,
+            name: 'Priya Dissanayake',
+            orders: 98,
+            revenue: 295000.0,
+            target: 350000.0,
+            achievementPercentage: 84.29,
+            expanded: false,
+            routes: [
+                {id: 4, name: 'Kandy Central', revenue: 98000, orders: 32, customers: 19, achievementPercentage: 78},
+                {id: 5, name: 'Kandy East', revenue: 87000, orders: 28, customers: 16, achievementPercentage: 82},
+                {id: 6, name: 'Peradeniya', revenue: 110000, orders: 38, customers: 25, achievementPercentage: 92},
+            ],
+        },
+        {
+            id: 3,
+            name: 'Chaminda Rathnayake',
+            orders: 134,
+            revenue: 425000.0,
+            target: 400000.0,
+            achievementPercentage: 106.25,
+            expanded: false,
+            routes: [
+                {id: 7, name: 'Galle Fort', revenue: 155000, orders: 48, customers: 32, achievementPercentage: 112},
+                {id: 8, name: 'Matara', revenue: 142000, orders: 45, customers: 28, achievementPercentage: 105},
+                {id: 9, name: 'Hikkaduwa', revenue: 128000, orders: 41, customers: 26, achievementPercentage: 98},
+            ],
+        },
+        {
+            id: 4,
+            name: 'Sanduni Wickrama',
+            orders: 89,
+            revenue: 267000.0,
+            target: 300000.0,
+            achievementPercentage: 89.0,
+            expanded: false,
+            routes: [
+                {id: 10, name: 'Negombo', revenue: 98000, orders: 31, customers: 18, achievementPercentage: 85},
+                {id: 11, name: 'Chilaw', revenue: 89000, orders: 28, customers: 15, achievementPercentage: 88},
+                {id: 12, name: 'Puttalam', revenue: 80000, orders: 30, customers: 17, achievementPercentage: 92},
+            ],
+        },
+        {
+            id: 5,
+            name: 'Tharaka Silva',
+            orders: 112,
+            revenue: 336000.0,
+            target: 350000.0,
+            achievementPercentage: 96.0,
+            expanded: false,
+            routes: [
+                {
+                    id: 13,
+                    name: 'Kurunegala Central',
+                    revenue: 125000,
+                    orders: 38,
+                    customers: 24,
+                    achievementPercentage: 98,
+                },
+                {id: 14, name: 'Kuliyapitiya', revenue: 108000, orders: 35, customers: 21, achievementPercentage: 95},
+                {id: 15, name: 'Mawathagama', revenue: 103000, orders: 39, customers: 23, achievementPercentage: 94},
+            ],
+        },
+    ];
+
+    // Charts
+    private salesChart: ApexCharts | null = null;
+    private categoryChart: ApexCharts | null = null;
+    private monthlyChart: ApexCharts | null = null;
+
+    ngAfterViewInit(): void {
+    }
+
+    ngOnDestroy(): void {
+        this.salesChart?.destroy();
+        this.categoryChart?.destroy();
+        this.monthlyChart?.destroy();
+    }
+
+    toggleSalesRepExpansion(repId: number): void {
+        const rep = this.salesReps.find((r) => r.id === repId);
+        if (rep) {
+            rep.expanded = !rep.expanded;
+        }
+    }
 
     constructor() {
-        this.getSalesSummary()
+        this.loadDashboardData();
     }
 
-    salesDate = ''
+    private loadDashboardData(): void {
+        forkJoin({
+            baseStatistics: this.statisticsService.baseStatistics(),
+            salesWeek: this.statisticsService.salesWeek(),
+            monthlyPerformance: this.statisticsService.monthlyPerformance()
+        }).subscribe({
+            next: ({baseStatistics, salesWeek, monthlyPerformance}) => {
+                this.handleBaseStatistics(baseStatistics.data);
+                this.initializeCharts(salesWeek.data, monthlyPerformance.data)
+            },
+            error: err => {
+                console.error('Error fetching dashboard data:', err);
+            }
+        });
+    }
 
-    getSalesSummary() {
-        if (!this.salesDate) {
-            const currentDate = new Date();
-            this.salesDate = currentDate.toISOString().split('T')[0];
+    private handleBaseStatistics(baseStatistics: any) {
+        this.totalRevenue = baseStatistics.RevenueThisMonth;
+        this.totalOrders = baseStatistics.TotalOrdersThisMonth;
+        this.activeCustomers = baseStatistics.ActiveCustomersAllTime;
+        this.pendingOrders = baseStatistics.UnpaidOrders;
+        this.CustomerChangePercentage = baseStatistics.CustomerChangePercentage;
+        this.UnpaidOrdersOverMonth = baseStatistics.UnpaidOrdersOverMonth;
+        this.RevenueChangePercentage = baseStatistics.RevenueChangePercentage;
+
+    }
+
+    private initializeCharts(salesWeek?: any, monthlyPerformance?: any): void {
+        this.initSalesChart(salesWeek || []);
+        this.initMonthlyChart(monthlyPerformance);
+    }
+
+    private initSalesChart(salesWeekData: SalesWeekItem[]): void {
+        if (!salesWeekData || !Array.isArray(salesWeekData)) {
+            console.warn('Sales week data is not available or invalid, using empty data');
+            salesWeekData = [];
         }
-        this.orderService.salesSummary(this.salesDate, true).subscribe();
+
+        const categories = salesWeekData.length > 0
+            ? salesWeekData.map(item => item.WeekDay)
+            : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+        const salesData = salesWeekData.length > 0
+            ? salesWeekData.map(item => parseFloat(item.TotalSales) || 0)
+            : [0, 0, 0, 0, 0, 0, 0];
+
+        const expensesData = salesWeekData.length > 0
+            ? salesWeekData.map(item => parseFloat(item.TotalExpenses) || 0)
+            : [0, 0, 0, 0, 0, 0, 0];
+
+        console.log('Categories:', categories);
+        console.log('Sales Data:', salesData);
+        console.log('Expenses Data:', expensesData);
+
+        const salesOptions = {
+            series: [
+                {
+                    name: 'Daily Sales',
+                    data: salesData,
+                },
+                {
+                    name: 'Daily Expenses',
+                    data: expensesData,
+                },
+            ],
+            chart: {
+                height: 320,
+                type: 'area',
+                toolbar: {show: false},
+            },
+            colors: ['#10B981', '#ff6c6c'],
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.7,
+                    opacityTo: 0.1,
+                    stops: [0, 90, 100],
+                },
+            },
+            dataLabels: {enabled: false},
+            stroke: {curve: 'smooth', width: 3},
+            xaxis: {
+                categories: categories,
+                labels: {style: {colors: '#64748B'}},
+            },
+            yaxis: {
+                labels: {
+                    formatter: (value: number) => `රු ${(value / 1000).toFixed(0)}K`,
+                    style: {colors: '#64748B'},
+                },
+            },
+            grid: {borderColor: '#E2E8F0'},
+            legend: {
+                position: 'top',
+                horizontalAlign: 'right',
+                fontSize: '12px',
+                fontWeight: '500',
+                labels: {colors: '#64748B'},
+            },
+            tooltip: {
+                shared: true,
+                intersect: false,
+                y: {
+                    formatter: (value: number) => `රු ${(value / 1000).toFixed(0)}K`,
+                },
+            },
+        };
+
+        const salesElement = document.querySelector('#salesChart');
+        if (salesElement) {
+            if (this.salesChart) {
+                this.salesChart.destroy();
+            }
+            this.salesChart = new ApexCharts(salesElement, salesOptions);
+            this.salesChart.render();
+        } else {
+            console.warn('Sales chart element (#salesChart) not found in the DOM.');
+        }
     }
 
+    private initMonthlyChart(monthlyPerformanceData: MonthlyPerformanceItem[]): void {
+        if (!monthlyPerformanceData || !Array.isArray(monthlyPerformanceData)) {
+            console.warn('Monthly performance data is not available or invalid, using empty data');
+            monthlyPerformanceData = [];
+        }
 
-    protected readonly faSearch = faSearch;
-    protected readonly faPlus = faPlus;
+        console.log('Monthly Performance Data:', monthlyPerformanceData);
+
+// Extract data from API response
+        const categories = monthlyPerformanceData.length > 0
+            ? monthlyPerformanceData.map(item => item.MonthShort)
+            : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        const revenueData = monthlyPerformanceData.length > 0
+            ? monthlyPerformanceData.map(item => parseFloat(item.MonthlyRevenue) || 0)
+            : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+        const ordersData = monthlyPerformanceData.length > 0
+            ? monthlyPerformanceData.map(item => parseInt(item.OrdersCount) || 0)
+            : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+        console.log('Categories:', categories);
+        console.log('Revenue Data:', revenueData);
+        console.log('Orders Data:', ordersData);
+
+        const monthlyOptions = {
+            series: [
+                {
+                    name: 'Revenue',
+                    type: 'column',
+                    data: revenueData, 
+                },
+                {
+                    name: 'Orders',
+                    type: 'line',
+                    data: ordersData,
+                },
+            ],
+            chart: {
+                height: 380,
+                type: 'line',
+                background: 'white',
+                foreColor: '#E5E7EB',
+                toolbar: {show: false},
+            },
+            theme: {mode: 'dark'},
+            colors: ['grey', 'black'],
+            stroke: {width: [0, 4], curve: 'smooth'},
+            plotOptions: {bar: {borderRadius: 4, columnWidth: '60%'}},
+            markers: {
+                size: [0, 6],
+                colors: ['#3B82F6', '#10B981'],
+                strokeColors: '#1F2937',
+                strokeWidth: 2,
+                hover: {size: 8},
+            },
+            dataLabels: {enabled: true, enabledOnSeries: [1]},
+            labels: categories, // Use dynamic categories
+            xaxis: {
+                labels: {style: {colors: '#9CA3AF', fontSize: '12px'}},
+                axisBorder: {show: false},
+                axisTicks: {show: false},
+            },
+            yaxis: [
+                {
+                    title: {text: 'Revenue (රු)', style: {color: '#9CA3AF', fontSize: '12px', fontWeight: '500'}},
+                    labels: {
+                        formatter: (value: number) => `රු ${(value / 1000).toFixed(0)}K`,
+                        style: {colors: '#9CA3AF', fontSize: '11px'},
+                    },
+                },
+                {
+                    opposite: true,
+                    title: {text: 'Orders', style: {color: '#9CA3AF', fontSize: '12px', fontWeight: '500'}},
+                    labels: {style: {colors: '#9CA3AF', fontSize: '11px'}},
+                },
+            ],
+            grid: {borderColor: '#374151', strokeDashArray: 3, xaxis: {lines: {show: false}}},
+            legend: {
+                position: 'top',
+                horizontalAlign: 'right',
+                fontSize: '12px',
+                fontWeight: '500',
+                labels: {colors: '#E5E7EB'},
+            },
+            tooltip: {
+                theme: 'dark',
+                shared: true,
+                intersect: false,
+                y: {
+                    formatter: (value: number, {seriesIndex}: any) => {
+                        if (seriesIndex === 0) {
+                            // Revenue formatting
+                            return `රු ${(value / 1000).toFixed(0)}K`;
+                        } else {
+                            // Orders formatting
+                            return `${value} orders`;
+                        }
+                    },
+                },
+            },
+        };
+
+        const monthlyElement = document.querySelector('#monthlyChart');
+        if (monthlyElement) {
+            if (this.monthlyChart) {
+                this.monthlyChart.destroy();
+            }
+            this.monthlyChart = new ApexCharts(monthlyElement, monthlyOptions);
+            this.monthlyChart.render();
+        } else {
+            console.warn('Monthly chart element (#monthlyChart) not found in the DOM.');
+        }
+    }
+
 
 }
